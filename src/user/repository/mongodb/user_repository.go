@@ -5,7 +5,9 @@ import (
 
 	"github.com/Fonzeka/Jame/src/domain"
 	"github.com/qiniu/qmgo"
+	"github.com/qiniu/qmgo/options"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type MongoUserRepository struct {
@@ -13,7 +15,12 @@ type MongoUserRepository struct {
 }
 
 func NewMongoUserRepository(db *qmgo.Database) domain.UserRepository {
-	return &MongoUserRepository{col: db.Collection("users")}
+	collection := db.Collection("users")
+
+	//Creamos el indice para que el userName no sea duplicado
+	collection.CreateOneIndex(context.TODO(), options.IndexModel{Key: []string{"userName"}, Unique: true})
+
+	return &MongoUserRepository{col: collection}
 }
 
 func (r *MongoUserRepository) GetAll(ctx context.Context) (res []domain.User, resErr error) {
@@ -27,7 +34,19 @@ func (r *MongoUserRepository) Insert(ctx context.Context, user *domain.User) (re
 		return *user, err
 	}
 
-	user.Id = result.InsertedID
+	user.Id = result.InsertedID.(primitive.ObjectID)
 
 	return *user, nil
+}
+
+func (r *MongoUserRepository) GetByUserName(ctx context.Context, userName string) (domain.User, error) {
+	user := domain.User{}
+
+	err := r.col.Find(ctx, bson.M{"userName": userName}).One(&user)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }

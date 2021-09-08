@@ -48,7 +48,7 @@ type UserRepository interface {
 	GetByUserName(ctx context.Context, userName string) (User, error)
 	Insert(ctx context.Context, user *User) (User, error)
 	//Update(*User) (User, error)
-	//Delete(UserName string)
+	Delete(ctx context.Context, UserName string) error
 }
 
 type UserUseCase interface {
@@ -57,5 +57,5 @@ type UserUseCase interface {
 	//GetByUserName() (User, error)
 	Insert(ctx context.Context, user *User) (User, error)
 	//Update(*User) (User, error)
-	//Delete(UserName string)
+	Delete(ctx context.Context, UserName string) error
 }

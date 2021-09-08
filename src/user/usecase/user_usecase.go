@@ -20,8 +20,8 @@ type UserUseCase struct {
 	repo domain.UserRepository
 }
 
-func NewUserUseCase(repo *domain.UserRepository) domain.UserUseCase {
-	return &UserUseCase{repo: *repo}
+func NewUserUseCase(repo domain.UserRepository) domain.UserUseCase {
+	return &UserUseCase{repo: repo}
 }
 
 func (uc *UserUseCase) GetAll(ctx context.Context) ([]domain.User, error) {
@@ -47,6 +47,10 @@ func (uc *UserUseCase) Insert(ctx context.Context, user *domain.User) (domain.Us
 
 	//Insertamos el user
 	return uc.repo.Insert(ctx, user)
+}
+
+func (ux *UserUseCase) Delete(ctx context.Context, UserName string) error {
+	return ux.repo.Delete(ctx, UserName)
 }
 
 func (ux *UserUseCase) Login(ctx context.Context, userName string, password string) (string, error) {

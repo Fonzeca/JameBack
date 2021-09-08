@@ -21,7 +21,7 @@ func main() {
 
 	repousers := mongodb.NewMongoUserRepository(db)
 
-	userUseCase := usecase.NewUserUseCase(&repousers)
+	userUseCase := usecase.NewUserUseCase(repousers)
 
 	userApi := REST.NewuserApi(userUseCase)
 

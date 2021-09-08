@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"sort"
 	"time"
 
 	"github.com/Fonzeka/Jame/src/domain"
@@ -11,12 +10,11 @@ import (
 
 func generateToken(user *domain.User) (string, error) {
 	//Buscamos en los roles el index de "admin"
-	indexAdmin := sort.Search(len(user.Roles), func(i int) bool { return user.Roles[i] == "admin" })
 	isAdmin := false
-
-	//Preguntamos si ese index es el correcto
-	if indexAdmin < len(user.Roles) && user.Roles[indexAdmin] == "admin" {
-		isAdmin = true
+	for _, v := range user.Roles {
+		if v == "admin" {
+			isAdmin = true
+		}
 	}
 
 	exiprationMinutes := viper.GetDuration("jwt.expiration")

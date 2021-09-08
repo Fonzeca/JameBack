@@ -28,6 +28,10 @@ func (r *MongoUserRepository) GetAll(ctx context.Context) (res []domain.User, re
 	return res, nil
 }
 
+func (r *MongoUserRepository) Delete(ctx context.Context, UserName string) error {
+	return r.col.Remove(ctx, bson.M{"userName": UserName})
+}
+
 func (r *MongoUserRepository) Insert(ctx context.Context, user *domain.User) (res domain.User, resErr error) {
 	result, err := r.col.InsertOne(ctx, user)
 	if err != nil {

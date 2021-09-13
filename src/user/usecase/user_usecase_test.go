@@ -99,3 +99,42 @@ func TestLogin(t *testing.T) {
 		mockUserRepo.AssertExpectations(t)
 	})
 }
+
+func TestUpdateUser(t *testing.T) {
+
+	mockUserRepo := new(mocks.UserRepositoryMock)
+
+	mockUser := domain.User{
+		UserName:       "username",
+		Password:       "Password",
+		DocumentType:   1,
+		DocumentNumber: "38096937",
+		Roles:          []string{"asdasd", "asdasd", "admin", "asdasd", "asdasd"},
+	}
+	mockUserRepo.On("Insert", mock.Anything, mock.Anything).Return(domain.User{}, nil).Once()
+	mockUserRepo.Insert(context.TODO(), &mockUser)
+
+	t.Run("update", func(t *testing.T) {
+		mockUserRepo.On("GetByUserName", mock.Anything, mock.AnythingOfType("string")).Return(domain.User{}, nil).Once()
+		mockUserRepo.On("Update", mock.Anything, mock.Anything).Return(nil).Once()
+		mockUserRepo.On("GetByUserName", mock.Anything, mock.AnythingOfType("string")).Return(domain.User{}, nil).Once()
+
+		u := usecase.NewUserUseCase(mockUserRepo)
+
+		userchange := mockUser
+
+		userchange.DocumentNumber = "45269148"
+
+		err := u.Update(context.TODO(), &userchange)
+		assert.NoError(t, err)
+
+		usr, err := u.GetByUserName(context.TODO(), userchange.UserName)
+		assert.NoError(t, err)
+
+		assert.Equal(t, usr.UserName, userchange.UserName)
+		assert.NotEqual(t, usr.DocumentNumber, mockUser.DocumentNumber)
+
+		mockUserRepo.AssertExpectations(t)
+	})
+
+}

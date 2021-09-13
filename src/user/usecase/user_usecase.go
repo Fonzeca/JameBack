@@ -6,15 +6,8 @@ import (
 
 	"github.com/Fonzeka/Jame/src/domain"
 	"github.com/Fonzeka/Jame/src/utils"
-	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
-
-type jwtCustomClaims struct {
-	UserName string `json:"userName"`
-	Admin    bool   `json:"admin"`
-	jwt.StandardClaims
-}
 
 type UserUseCase struct {
 	repo domain.UserRepository
@@ -22,6 +15,23 @@ type UserUseCase struct {
 
 func NewUserUseCase(repo domain.UserRepository) domain.UserUseCase {
 	return &UserUseCase{repo: repo}
+}
+
+func (uc *UserUseCase) GetByUserName(ctx context.Context, userName string) (domain.User, error) {
+	return uc.repo.GetByUserName(ctx, userName)
+}
+
+func (uc *UserUseCase) Update(ctx context.Context, user *domain.User) error {
+
+	usr, err := uc.repo.GetByUserName(ctx, user.UserName)
+
+	if err != nil {
+		return err
+	}
+
+	user.Id = usr.Id
+
+	return uc.repo.Update(ctx, user)
 }
 
 func (uc *UserUseCase) GetAll(ctx context.Context) ([]domain.User, error) {

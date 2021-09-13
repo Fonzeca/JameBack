@@ -23,6 +23,7 @@ func NewuserApi(useCase domain.UserUseCase) *UserApi {
 //Router
 func (api *UserApi) Router(e *echo.Echo) {
 	e.POST("/user", api.InsertOne)
+	e.PUT("/user", api.UpdateOne)
 	e.GET("/users", api.GetAllusers)
 	e.POST("/login", api.Login)
 }
@@ -63,15 +64,44 @@ func (api *UserApi) InsertOne(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+func (api *UserApi) GetUserByUserName(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	values, _ := c.FormParams()
+	username := values.Get("userName")
+
+	usr, err := api.useCase.GetByUserName(ctx, username)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, usr)
+}
+
 func (api *UserApi) GetAllusers(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	users, err := api.useCase.GetAll(ctx)
 	if err != nil {
-		c.Error(err)
 		return err
 	}
 
 	return c.JSON(http.StatusOK, users)
+}
+
+func (api *UserApi) UpdateOne(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	user := domain.User{}
+	c.Bind(&user)
+
+	err := api.useCase.Update(ctx, &user)
+	if err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
 }

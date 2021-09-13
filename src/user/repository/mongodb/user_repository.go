@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Fonzeka/Jame/src/domain"
 	"github.com/qiniu/qmgo"
@@ -26,6 +27,12 @@ func NewMongoUserRepository(db *qmgo.Database) domain.UserRepository {
 func (r *MongoUserRepository) GetAll(ctx context.Context) (res []domain.User, resErr error) {
 	r.col.Find(ctx, bson.M{}).All(&res)
 	return res, nil
+}
+
+func (r *MongoUserRepository) Update(ctx context.Context, user *domain.User) error {
+	result, err := r.col.Upsert(ctx, bson.M{"userName": user.UserName}, user)
+	fmt.Println(result)
+	return err
 }
 
 func (r *MongoUserRepository) Delete(ctx context.Context, UserName string) error {

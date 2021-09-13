@@ -8,6 +8,12 @@ import (
 	"github.com/spf13/viper"
 )
 
+type jwtCustomClaims struct {
+	UserName string `json:"userName"`
+	Admin    bool   `json:"admin"`
+	jwt.StandardClaims
+}
+
 func generateToken(user *domain.User) (string, error) {
 	//Buscamos en los roles el index de "admin"
 	isAdmin := false

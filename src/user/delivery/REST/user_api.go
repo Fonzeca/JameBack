@@ -24,6 +24,7 @@ func NewuserApi(useCase domain.UserUseCase) *UserApi {
 func (api *UserApi) Router(e *echo.Echo) {
 	e.POST("/user", api.InsertOne)
 	e.PUT("/user", api.UpdateOne)
+	e.GET("/user", api.GetUserByUserName)
 	e.GET("/users", api.GetAllusers)
 	e.POST("/login", api.Login)
 }

@@ -12,6 +12,19 @@ type UserRepositoryMock struct {
 	mock.Mock
 }
 
+func (u *UserRepositoryMock) Update(ctx context.Context, user *domain.User) error {
+	ret := u.Called(ctx)
+
+	for i, u2 := range u.users {
+		if u2.UserName == user.UserName {
+			u.users[i] = *user
+			return ret.Error(0)
+		}
+	}
+
+	return ret.Error(0)
+}
+
 func (u *UserRepositoryMock) GetAll(ctx context.Context) ([]domain.User, error) {
 	ret := u.Called(ctx)
 

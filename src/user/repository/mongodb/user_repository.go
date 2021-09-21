@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Fonzeka/Jame/src/domain"
+	"github.com/Fonzeka/Jame/src/utils"
 	"github.com/qiniu/qmgo"
 	"github.com/qiniu/qmgo/options"
 	"go.mongodb.org/mongo-driver/bson"
@@ -56,7 +57,7 @@ func (r *MongoUserRepository) GetByUserName(ctx context.Context, userName string
 	err := r.col.Find(ctx, bson.M{"userName": userName}).One(&user)
 
 	if err != nil {
-		return user, err
+		return user, utils.ErrUserNotFound
 	}
 
 	return user, nil

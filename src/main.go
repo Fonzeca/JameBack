@@ -30,6 +30,7 @@ func main() {
 	// Root level middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(usecase.CheckLogged)
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	userApi.Router(e)
@@ -54,7 +55,7 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 		msg = http.StatusText(code)
 	}
 
-	err = c.JSON(code, utils.NewHTTPErrorWithMessage(code, key, msg))
+	err = c.JSON(code, utils.NewHTTPError(code, key, msg))
 	if err != nil {
 		c.Logger().Error(err)
 	}
@@ -62,7 +63,7 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 
 func initDataBase() (*qmgo.Database, error) {
 	ctx := context.Background()
-	cli, err := qmgo.Open(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017", Database: "Login", Coll: "user"})
+	cli, err := qmgo.Open(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017", Database: "UsersHub", Coll: "user"})
 	if err != nil {
 		return nil, err
 	}

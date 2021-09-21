@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Fonzeka/Jame/src/domain"
+	"github.com/Fonzeka/Jame/src/utils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -22,10 +23,11 @@ func NewuserApi(useCase domain.UserUseCase) *UserApi {
 
 //Router
 func (api *UserApi) Router(e *echo.Echo) {
-	e.POST("/user", api.InsertOne)
-	e.PUT("/user", api.UpdateOne)
-	e.GET("/user", api.GetUserByUserName)
-	e.GET("/users", api.GetAllusers)
+	e.POST("/admin/user", api.InsertOne)
+	e.PUT("/admin/user", api.UpdateOne)
+	e.GET("/admin/user", api.GetUserByUserName)
+	e.GET("/admin/users", api.GetAllusers)
+	e.POST("/validate", api.ValidateToken)
 	e.POST("/login", api.Login)
 }
 
@@ -71,6 +73,9 @@ func (api *UserApi) GetUserByUserName(c echo.Context) error {
 
 	values, _ := c.FormParams()
 	username := values.Get("userName")
+	if len(username) <= 0 {
+		return utils.ErrBadRequestGetuser
+	}
 
 	usr, err := api.useCase.GetByUserName(ctx, username)
 	if err != nil {
@@ -104,5 +109,9 @@ func (api *UserApi) UpdateOne(c echo.Context) error {
 		return err
 	}
 
+	return c.NoContent(http.StatusOK)
+}
+
+func (api *UserApi) ValidateToken(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }

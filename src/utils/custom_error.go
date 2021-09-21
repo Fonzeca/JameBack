@@ -6,19 +6,11 @@ type HttpError struct {
 	Message string `json:"message"`
 }
 
-func NewHTTPErrorWithMessage(code int, key string, msg string) *HttpError {
+func NewHTTPError(code int, key string, msg string) *HttpError {
 	return &HttpError{
 		Code:    code,
 		Key:     key,
 		Message: msg,
-	}
-}
-
-func NewHTTPError(code int, key string) *HttpError {
-	return &HttpError{
-		Code:    code,
-		Key:     key,
-		Message: Messages[key],
 	}
 }
 

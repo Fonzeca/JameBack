@@ -1,10 +1,15 @@
 package usecase
 
 import (
+	"fmt"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/Fonzeka/Jame/src/domain"
+	"github.com/Fonzeka/Jame/src/utils"
 	"github.com/golang-jwt/jwt"
+	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
 )
 
@@ -45,4 +50,47 @@ func generateToken(user *domain.User) (string, error) {
 	}
 
 	return t, nil
+}
+
+func parseToken(token *jwt.Token) (interface{}, error) {
+	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+	}
+
+	secret := viper.GetString("jwt.secret")
+
+	return []byte(secret), nil
+}
+
+func CheckLogged(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if !strings.Contains(c.Path(), "login") && !strings.Contains(c.Path(), "public") {
+
+			authorization := c.Request().Header.Get("Authorization")
+
+			re := regexp.MustCompile("Bearer (.+)")
+
+			if !re.MatchString(authorization) {
+				return utils.ErrUnauthorized
+			}
+
+			recivedToken := re.FindStringSubmatch(authorization)[1]
+
+			token, err := jwt.Parse(recivedToken, parseToken)
+			if err != nil {
+				return utils.ErrExpiredToken
+			}
+
+			if !token.Valid {
+				return utils.ErrExpiredToken
+			}
+
+			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+				c.Set("claims", claims)
+			} else {
+				return utils.ErrUnauthorized
+			}
+		}
+		return next(c)
+	}
 }

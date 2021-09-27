@@ -9,9 +9,19 @@ var (
 
 	ErrTryLogin = NewHTTPError(http.StatusBadRequest, "3-UNA", "Username or password incorrect")
 
-	ErrBadRequestGetuser = NewHTTPError(http.StatusBadRequest, "4-BR", "Bad request")
+	ErrBadRequest = NewHTTPError(http.StatusBadRequest, "4-BR", "Bad request")
 
 	ErrUnauthorized = NewHTTPError(http.StatusUnauthorized, "5-UN", "Unauthorized")
 
 	ErrExpiredToken = NewHTTPError(http.StatusUnauthorized, "6-ET", "Expired token")
+
+	ErrOnInsertNoUsername = NewHTTPError(http.StatusBadRequest, "8-UNE", "Username empty")
+
+	ErrOnInsertNoPassword = NewHTTPError(http.StatusBadRequest, "9-PE", "Password empty")
+
+	ErrOnInsertNoDocument = NewHTTPError(http.StatusBadRequest, "10-DTE", "Document type empty")
 )
+
+func ErrNoValidRole(roleName string) error {
+	return NewHTTPError(http.StatusBadRequest, "7-NVR", "No valid role: "+roleName)
+}

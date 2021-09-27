@@ -4,9 +4,13 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/Fonzeka/Jame/src/user/delivery/REST"
-	"github.com/Fonzeka/Jame/src/user/repository/mongodb"
-	"github.com/Fonzeka/Jame/src/user/usecase"
+	_RESTrole "github.com/Fonzeka/Jame/src/roles/delivery/REST"
+	_mongoroles "github.com/Fonzeka/Jame/src/roles/repository/mongodb"
+	_usecaseroles "github.com/Fonzeka/Jame/src/roles/usecase"
+	"github.com/Fonzeka/Jame/src/security/jwt"
+	_RESTuser "github.com/Fonzeka/Jame/src/user/delivery/REST"
+	_mongouser "github.com/Fonzeka/Jame/src/user/repository/mongodb"
+	_usecaseuser "github.com/Fonzeka/Jame/src/user/usecase"
 	"github.com/Fonzeka/Jame/src/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -19,21 +23,25 @@ func main() {
 
 	db, _ := initDataBase()
 
-	repousers := mongodb.NewMongoUserRepository(db)
+	reporoles := _mongoroles.NewMongoRolesRepository(db)
+	repousers := _mongouser.NewMongoUserRepository(db)
 
-	userUseCase := usecase.NewUserUseCase(repousers)
+	repoUseCase := _usecaseroles.NewRolesUseCase(reporoles)
+	userUseCase := _usecaseuser.NewUserUseCase(repousers, repoUseCase)
 
-	userApi := REST.NewuserApi(userUseCase)
+	rolesApi := _RESTrole.NewuserApi(repoUseCase)
+	userApi := _RESTuser.NewuserApi(userUseCase)
 
 	e := echo.New()
 
 	// Root level middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(usecase.CheckLogged)
+	e.Use(jwt.CheckLogged)
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	userApi.Router(e)
+	rolesApi.Router(e)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

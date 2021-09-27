@@ -8,6 +8,7 @@ require (
 	github.com/qiniu/qmgo v1.0.2
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
+	github.com/thoas/go-funk v0.9.1
 	go.mongodb.org/mongo-driver v1.7.1
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
 	golang.org/x/sys v0.0.0-20210903071746-97244b99971b // indirect

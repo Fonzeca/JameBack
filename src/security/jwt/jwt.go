@@ -1,4 +1,4 @@
-package usecase
+package jwt
 
 import (
 	"fmt"
@@ -11,15 +11,17 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
+	"github.com/thoas/go-funk"
 )
 
 type jwtCustomClaims struct {
-	UserName string `json:"userName"`
-	Admin    bool   `json:"admin"`
+	UserName string   `json:"userName"`
+	Admin    bool     `json:"admin"`
+	Roles    []string `json:"roles"`
 	jwt.StandardClaims
 }
 
-func generateToken(user *domain.User) (string, error) {
+func GenerateToken(user *domain.User) (string, error) {
 	//Buscamos en los roles el index de "admin"
 	isAdmin := false
 	for _, v := range user.Roles {
@@ -34,6 +36,7 @@ func generateToken(user *domain.User) (string, error) {
 	claims := &jwtCustomClaims{
 		UserName: user.UserName,
 		Admin:    isAdmin,
+		Roles:    user.Roles,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Minute * exiprationMinutes).Unix(),
 		},
@@ -52,6 +55,8 @@ func generateToken(user *domain.User) (string, error) {
 	return t, nil
 }
 
+//Validamos la construccion del token
+//Si esta todo ok, devolvemos el "secret". Funcion necesaria para jwt
 func parseToken(token *jwt.Token) (interface{}, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -62,6 +67,8 @@ func parseToken(token *jwt.Token) (interface{}, error) {
 	return []byte(secret), nil
 }
 
+// Middeware para chequear que el usuario este logueado
+// Se setea los claims para que lo use otro middeware
 func CheckLogged(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if !strings.Contains(c.Path(), "login") && !strings.Contains(c.Path(), "public") {
@@ -92,5 +99,31 @@ func CheckLogged(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 		return next(c)
+	}
+}
+
+func CheckInRole(pRolesName ...string) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if claims, ok := c.Get("claims").(jwt.MapClaims); ok {
+				interfaces := claims["roles"].([]interface{})
+
+				var roles []string
+
+				funk.ForEach(interfaces, func(x interface{}) {
+					roles = append(roles, x.(string))
+				})
+
+				intersect := funk.IntersectString(pRolesName, roles)
+
+				if len(intersect) > 0 {
+					return next(c)
+				}
+
+				return utils.ErrUnauthorized
+			}
+
+			return next(c)
+		}
 	}
 }

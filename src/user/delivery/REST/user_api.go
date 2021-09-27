@@ -6,27 +6,33 @@ import (
 	"time"
 
 	"github.com/Fonzeka/Jame/src/domain"
+	myjwt "github.com/Fonzeka/Jame/src/security/jwt"
+	"github.com/Fonzeka/Jame/src/user/usecase"
 	"github.com/Fonzeka/Jame/src/utils"
+	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
 type UserApi struct {
-	useCase domain.UserUseCase
+	useCase usecase.UserUseCase
 }
 
 type json map[string]interface{}
 
 //Constructor
-func NewuserApi(useCase domain.UserUseCase) *UserApi {
+func NewuserApi(useCase usecase.UserUseCase) *UserApi {
 	return &UserApi{useCase: useCase}
 }
 
 //Router
 func (api *UserApi) Router(e *echo.Echo) {
-	e.POST("/admin/user", api.InsertOne)
-	e.PUT("/admin/user", api.UpdateOne)
-	e.GET("/admin/user", api.GetUserByUserName)
-	e.GET("/admin/users", api.GetAllusers)
+
+	e.POST("/admin/user", api.InsertOne, myjwt.CheckInRole("admin"))
+	e.PUT("/admin/user", api.UpdateOne, myjwt.CheckInRole("admin"))
+	e.GET("/admin/user", api.GetUserByUserName, myjwt.CheckInRole("admin"))
+	e.GET("/admin/users", api.GetAllusers, myjwt.CheckInRole("admin"))
+
+	e.GET("/logged", api.GetUserLogged)
 	e.POST("/validate", api.ValidateToken)
 	e.POST("/login", api.Login)
 }
@@ -74,7 +80,7 @@ func (api *UserApi) GetUserByUserName(c echo.Context) error {
 	values, _ := c.FormParams()
 	username := values.Get("userName")
 	if len(username) <= 0 {
-		return utils.ErrBadRequestGetuser
+		return utils.ErrBadRequest
 	}
 
 	usr, err := api.useCase.GetByUserName(ctx, username)
@@ -114,4 +120,21 @@ func (api *UserApi) UpdateOne(c echo.Context) error {
 
 func (api *UserApi) ValidateToken(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
+}
+
+func (api *UserApi) GetUserLogged(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	if claims, ok := c.Get("claims").(jwt.MapClaims); ok {
+		user, err := api.useCase.GetUserByToken(ctx, claims)
+
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(http.StatusOK, user)
+	}
+
+	return c.NoContent(http.StatusNotFound)
 }

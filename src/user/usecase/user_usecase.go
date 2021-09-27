@@ -4,16 +4,20 @@ import (
 	"context"
 
 	"github.com/Fonzeka/Jame/src/domain"
+	"github.com/Fonzeka/Jame/src/roles/usecase"
+	myjwt "github.com/Fonzeka/Jame/src/security/jwt"
 	"github.com/Fonzeka/Jame/src/utils"
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserUseCase struct {
-	repo domain.UserRepository
+	repo     domain.UserRepository
+	rolecase usecase.RolesUseCase
 }
 
-func NewUserUseCase(repo domain.UserRepository) domain.UserUseCase {
-	return &UserUseCase{repo: repo}
+func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase) UserUseCase {
+	return UserUseCase{repo: repo, rolecase: roleUsecase}
 }
 
 // Obtiene el usuario por el nombre de usuario
@@ -50,6 +54,11 @@ func (uc *UserUseCase) Update(ctx context.Context, user *domain.User) error {
 		usrDb.DocumentNumber = user.DocumentNumber
 	}
 
+	//Validamos que el usuario tenga bien los roles
+	if err := uc.rolecase.ValidateRoles(ctx, user.Roles...); err != nil {
+		return err
+	}
+
 	return uc.repo.Update(ctx, &usrDb)
 }
 
@@ -63,6 +72,11 @@ func (uc *UserUseCase) GetAll(ctx context.Context) ([]domain.User, error) {
 func (uc *UserUseCase) Insert(ctx context.Context, user *domain.User) (domain.User, error) {
 	//Validamos los datos del usuario para insertar
 	if err := user.ValidateData(); err != nil {
+		return *user, err
+	}
+
+	//Validamos que el usuario tenga bien los roles
+	if err := uc.rolecase.ValidateRoles(ctx, user.Roles...); err != nil {
 		return *user, err
 	}
 
@@ -101,10 +115,24 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 		return "", utils.ErrTryLogin
 	}
 
-	token, err := generateToken(&user)
+	// Generamos el token
+	token, err := myjwt.GenerateToken(&user)
 	if err != nil {
 		return "", err
 	}
 
 	return token, nil
+}
+
+func (ux *UserUseCase) GetUserByToken(ctx context.Context, claims jwt.MapClaims) (domain.User, error) {
+	//Obtenemos el userName desde el mismo contexto de echo
+	userName := claims["userName"].(string)
+
+	//Buscamos un usuario con el mismo userName
+	user, err := ux.repo.GetByUserName(ctx, userName)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }

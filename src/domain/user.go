@@ -2,9 +2,8 @@ package domain
 
 import (
 	"context"
-	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/Fonzeka/Jame/src/utils"
 	"github.com/qiniu/qmgo/field"
 )
 
@@ -29,30 +28,21 @@ const (
 func (u *User) ValidateData() error {
 
 	if u.UserName == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "userName empty")
+		return utils.ErrOnInsertNoUsername
 	}
 
 	if u.Password == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "password empty")
+		return utils.ErrOnInsertNoPassword
 	}
 
 	if u.DocumentType < 1 || u.DocumentNumber == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "document type empty")
+		return utils.ErrOnInsertNoDocument
 	}
 
 	return nil
 }
 
 type UserRepository interface {
-	GetAll(ctx context.Context) ([]User, error)
-	GetByUserName(ctx context.Context, userName string) (User, error)
-	Insert(ctx context.Context, user *User) (User, error)
-	Update(ctx context.Context, user *User) error
-	Delete(ctx context.Context, UserName string) error
-}
-
-type UserUseCase interface {
-	Login(ctx context.Context, userName string, password string) (string, error)
 	GetAll(ctx context.Context) ([]User, error)
 	GetByUserName(ctx context.Context, userName string) (User, error)
 	Insert(ctx context.Context, user *User) (User, error)

@@ -130,6 +130,7 @@ func (ux *UserUseCase) GetUserByToken(ctx context.Context, claims jwt.MapClaims)
 
 	//Buscamos un usuario con el mismo userName
 	user, err := ux.repo.GetByUserName(ctx, userName)
+	user.Password = ""
 	if err != nil {
 		return user, err
 	}

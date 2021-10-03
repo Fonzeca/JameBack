@@ -31,7 +31,8 @@ func validateAdminUser(uc *UserUseCase) {
 
 	data, _ := uc.GetAll(ctx)
 	if len(data) <= 0 {
-		if len(uc.rolecase.GetAllRoles(ctx)) <= {
+		data2, _ := uc.rolecase.GetAllRoles(ctx)
+		if len(data2) <= 0 {
 			uc.rolecase.InsertRole(ctx, domain.Role{
 				Name: "admin",
 			})

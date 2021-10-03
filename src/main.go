@@ -47,7 +47,9 @@ func main() {
 	userApi.Router(e)
 	rolesApi.Router(e)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	port := viper.GetString("server.port")
+
+	e.Logger.Fatal(e.Start(":" + port))
 }
 
 func customHTTPErrorHandler(err error, c echo.Context) {

@@ -29,19 +29,17 @@ func validateAdminUser(uc *UserUseCase) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	data, err := uc.GetAll(ctx)
-	if err == nil {
-		if len(data) <= 0 {
-			uc.Insert(ctx, &domain.User{
-				UserName:       "afonzo",
-				Password:       "123456",
-				FirstName:      "Alexis",
-				LastName:       "Fonzo",
-				DocumentType:   1,
-				DocumentNumber: "38096937",
-				Roles:          []string{"admin"},
-			})
-		}
+	data, _ := uc.GetAll(ctx)
+	if len(data) <= 0 {
+		uc.Insert(ctx, &domain.User{
+			UserName:       "afonzo",
+			Password:       "123456",
+			FirstName:      "Alexis",
+			LastName:       "Fonzo",
+			DocumentType:   1,
+			DocumentNumber: "38096937",
+			Roles:          []string{"admin"},
+		})
 	}
 }
 

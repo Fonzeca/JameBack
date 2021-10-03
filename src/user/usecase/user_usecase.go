@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/Fonzeka/Jame/src/domain"
 	"github.com/Fonzeka/Jame/src/roles/usecase"
@@ -17,7 +18,31 @@ type UserUseCase struct {
 }
 
 func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase) UserUseCase {
-	return UserUseCase{repo: repo, rolecase: roleUsecase}
+	uc := UserUseCase{repo: repo, rolecase: roleUsecase}
+
+	go validateAdminUser(&uc)
+
+	return uc
+}
+
+func validateAdminUser(uc *UserUseCase) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	data, err := uc.GetAll(ctx)
+	if err == nil {
+		if len(data) <= 0 {
+			uc.Insert(ctx, &domain.User{
+				UserName:       "afonzo",
+				Password:       "123456",
+				FirstName:      "Alexis",
+				LastName:       "Fonzo",
+				DocumentType:   1,
+				DocumentNumber: "38096937",
+				Roles:          []string{"admin"},
+			})
+		}
+	}
 }
 
 // Obtiene el usuario por el nombre de usuario

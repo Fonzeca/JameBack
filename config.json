@@ -7,8 +7,8 @@
         "url": "localhost",
         "port": "27017",
         "database": "UserHub",
-        "user": "usrUserHub",
-        "password": "somepassword"
+        "user": "",
+        "password": ""
     },
     "server": {
         "port": "5623"

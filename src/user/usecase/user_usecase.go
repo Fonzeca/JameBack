@@ -31,6 +31,12 @@ func validateAdminUser(uc *UserUseCase) {
 
 	data, _ := uc.GetAll(ctx)
 	if len(data) <= 0 {
+		if len(uc.rolecase.GetAllRoles(ctx)) <= {
+			uc.rolecase.InsertRole(ctx, domain.Role{
+				Name: "admin",
+			})
+		}
+
 		uc.Insert(ctx, &domain.User{
 			UserName:       "afonzo",
 			Password:       "123456",

@@ -1,6 +1,13 @@
 {
-    "jwt" : {
-        "secret" : "ThisIsASecret",
-        "expiration" : "10" 
+    "jwt": {
+        "secret": "ThisIsASecret",
+        "expiration": "10"
+    },
+    "db": {
+        "url": "vps-1791261-x.dattaweb.com",
+        "port": "27017",
+        "database": "UserHub",
+        "user": "usrUserHub",
+        "password": "somepassword"
     }
 }

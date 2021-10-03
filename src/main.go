@@ -15,6 +15,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/qiniu/qmgo"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -37,6 +38,9 @@ func main() {
 	// Root level middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+	}))
 	e.Use(jwt.CheckLogged)
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
@@ -71,7 +75,16 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 
 func initDataBase() (*qmgo.Database, error) {
 	ctx := context.Background()
-	cli, err := qmgo.Open(ctx, &qmgo.Config{Uri: "mongodb://localhost:27017", Database: "UsersHub", Coll: "user"})
+
+	url := viper.GetString("db.url")
+	port := viper.GetString("db.port")
+	username := viper.GetString("db.user")
+	password := viper.GetString("db.password")
+	database := viper.GetString("db.database")
+
+	uri := "mongodb://" + username + ":" + password + "@" + url + ":" + port + "/" + database
+
+	cli, err := qmgo.Open(ctx, &qmgo.Config{Uri: uri, Database: database, Coll: "user", Auth: &qmgo.Credential{AuthSource: database, Username: username, Password: password}})
 	if err != nil {
 		return nil, err
 	}

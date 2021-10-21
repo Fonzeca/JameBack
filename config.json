@@ -4,11 +4,11 @@
         "expiration": "10"
     },
     "db": {
-        "url": "localhost",
+        "url": "vps-1791261-x.dattaweb.com",
         "port": "27017",
         "database": "UserHub",
-        "user": "",
-        "password": ""
+        "user": "usrUserHub",
+        "password": "somepassword"
     },
     "server": {
         "port": "5623"

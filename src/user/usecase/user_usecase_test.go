@@ -210,6 +210,7 @@ func TestUpdateUser(t *testing.T) {
 				assert.Equal(t, err, x.errorExpected)
 			} else {
 				assert.NoError(t, err)
+				//TODO: validar cambios de roles
 			}
 
 		})

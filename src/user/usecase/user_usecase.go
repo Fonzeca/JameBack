@@ -89,6 +89,8 @@ func (uc *UserUseCase) Update(ctx context.Context, user *domain.User) error {
 		return err
 	}
 
+	usrDb.Roles = user.Roles
+
 	return uc.repo.Update(ctx, &usrDb)
 }
 

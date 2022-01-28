@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Fonzeka/Jame/src/domain"
-	"github.com/Fonzeka/Jame/src/domain/mocks"
-	_rolesUseCase "github.com/Fonzeka/Jame/src/roles/usecase"
-	_userUseCase "github.com/Fonzeka/Jame/src/user/usecase"
-	"github.com/Fonzeka/Jame/src/utils"
+	"github.com/Fonzeca/UserHub/src/domain"
+	"github.com/Fonzeca/UserHub/src/domain/mocks"
+	_rolesUseCase "github.com/Fonzeca/UserHub/src/roles/usecase"
+	_userUseCase "github.com/Fonzeca/UserHub/src/user/usecase"
+	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
@@ -19,6 +19,9 @@ func TestCreateUser(t *testing.T) {
 	mockRoleRepo := new(mocks.RolesRepository)
 	ru := _rolesUseCase.NewRolesUseCase(mockRoleRepo)
 
+	mockUserRepo.On("GetAll", mock.Anything).Return([]domain.User{
+		domain.User{},
+	}, nil)
 	u := _userUseCase.NewUserUseCase(mockUserRepo, ru)
 
 	var createUserTests = []struct {
@@ -85,6 +88,9 @@ func TestLogin(t *testing.T) {
 	mockRoleRepo := new(mocks.RolesRepository)
 	ru := _rolesUseCase.NewRolesUseCase(mockRoleRepo)
 
+	mockUserRepo.On("GetAll", mock.Anything).Return([]domain.User{
+		domain.User{},
+	}, nil)
 	u := _userUseCase.NewUserUseCase(mockUserRepo, ru)
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("12345"), 8)
@@ -160,6 +166,9 @@ func TestUpdateUser(t *testing.T) {
 	mockRoleRepo := new(mocks.RolesRepository)
 	ru := _rolesUseCase.NewRolesUseCase(mockRoleRepo)
 
+	mockUserRepo.On("GetAll", mock.Anything).Return([]domain.User{
+		domain.User{},
+	}, nil)
 	u := _userUseCase.NewUserUseCase(mockUserRepo, ru)
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("12345"), 8)
@@ -215,5 +224,29 @@ func TestUpdateUser(t *testing.T) {
 
 		})
 	}
+
+}
+
+func TestSendEmail(t *testing.T) {
+	/* ch := make(chan string)
+
+	go utils.SendEmailChannel(ch)
+
+	t.Run("TestSendEmail", func(t *testing.T) {
+		t.Log("Esperando 5 segundos")
+		time.Sleep(5 * time.Second)
+
+		email1 := "alexisfonzos@gmail.com"
+		t.Log("Enviando a " + email1)
+		ch <- email1
+
+		t.Log("Esperando 5 segundos")
+		time.Sleep(10 * time.Second)
+
+		email2 := "alexisfonzos_@hotmail.com"
+		t.Log("enviando a " + email2)
+		ch <- email2
+
+	}) */
 
 }

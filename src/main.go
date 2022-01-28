@@ -4,14 +4,15 @@ import (
 	"context"
 	"net/http"
 
-	_RESTrole "github.com/Fonzeka/Jame/src/roles/delivery/REST"
-	_mongoroles "github.com/Fonzeka/Jame/src/roles/repository/mongodb"
-	_usecaseroles "github.com/Fonzeka/Jame/src/roles/usecase"
-	"github.com/Fonzeka/Jame/src/security/jwt"
-	_RESTuser "github.com/Fonzeka/Jame/src/user/delivery/REST"
-	_mongouser "github.com/Fonzeka/Jame/src/user/repository/mongodb"
-	_usecaseuser "github.com/Fonzeka/Jame/src/user/usecase"
-	"github.com/Fonzeka/Jame/src/utils"
+	"github.com/Fonzeca/UserHub/src/emails"
+	_RESTrole "github.com/Fonzeca/UserHub/src/roles/delivery/REST"
+	_mongoroles "github.com/Fonzeca/UserHub/src/roles/repository/mongodb"
+	_usecaseroles "github.com/Fonzeca/UserHub/src/roles/usecase"
+	"github.com/Fonzeca/UserHub/src/security/jwt"
+	_RESTuser "github.com/Fonzeca/UserHub/src/user/delivery/REST"
+	_mongouser "github.com/Fonzeca/UserHub/src/user/repository/mongodb"
+	_usecaseuser "github.com/Fonzeca/UserHub/src/user/usecase"
+	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/qiniu/qmgo"
@@ -21,6 +22,9 @@ import (
 func main() {
 
 	utils.InitConfig()
+
+	deamon := &emails.EmailDeamon{}
+	deamon.Init()
 
 	db, _ := initDataBase()
 

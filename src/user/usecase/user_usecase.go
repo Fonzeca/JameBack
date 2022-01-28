@@ -4,11 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/Fonzeka/Jame/src/domain"
-	"github.com/Fonzeka/Jame/src/roles/usecase"
-	myjwt "github.com/Fonzeka/Jame/src/security/jwt"
-	"github.com/Fonzeka/Jame/src/utils"
+	"github.com/Fonzeca/UserHub/src/domain"
+	"github.com/Fonzeca/UserHub/src/emails"
+	"github.com/Fonzeca/UserHub/src/roles/usecase"
+	myjwt "github.com/Fonzeca/UserHub/src/security/jwt"
+	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/golang-jwt/jwt"
+	uuid "github.com/nu7hatch/gouuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -168,4 +170,37 @@ func (ux *UserUseCase) GetUserByToken(ctx context.Context, claims jwt.MapClaims)
 	}
 
 	return user, nil
+}
+
+func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username string) error {
+
+	user, err := ux.GetByUserName(ctx, username)
+	if err != nil {
+		return err
+	}
+
+	u4, err := uuid.NewV4()
+	if err != nil {
+		return err
+	}
+
+	//Hasheamos la pass
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u4.String()), 8)
+	if err != nil {
+		return err
+	}
+
+	user.RecoverPasswordToken = string(hashedPassword)
+
+	emails.ChannelEmails <- emails.Recuperacion{
+		Email: username,
+		Token: u4.String(),
+	}
+
+	err = ux.repo.Update(ctx, &user)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Fonzeka/Jame/src/domain"
-	"github.com/Fonzeka/Jame/src/utils"
+	"github.com/Fonzeca/UserHub/src/domain"
+	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/qiniu/qmgo"
 	"github.com/qiniu/qmgo/options"
 	"go.mongodb.org/mongo-driver/bson"

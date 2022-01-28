@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Fonzeka/Jame/src/domain"
-	myjwt "github.com/Fonzeka/Jame/src/security/jwt"
-	"github.com/Fonzeka/Jame/src/user/usecase"
-	"github.com/Fonzeka/Jame/src/utils"
+	"github.com/Fonzeca/UserHub/src/domain"
+	myjwt "github.com/Fonzeca/UserHub/src/security/jwt"
+	"github.com/Fonzeca/UserHub/src/user/usecase"
+	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
@@ -32,6 +32,7 @@ func (api *UserApi) Router(e *echo.Echo) {
 	e.GET("/admin/user", api.GetUserByUserName, myjwt.CheckInRole("admin"))
 	e.GET("/admin/users", api.GetAllusers, myjwt.CheckInRole("admin"))
 
+	e.POST("/recoverPassword", api.SendEmailToRecoverPassword)
 	e.GET("/logged", api.GetUserLogged)
 	e.POST("/validate", api.ValidateToken)
 	e.POST("/login", api.Login)
@@ -132,9 +133,20 @@ func (api *UserApi) GetUserLogged(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-
 		return c.JSON(http.StatusOK, user)
 	}
 
 	return c.NoContent(http.StatusNotFound)
+}
+
+func (api *UserApi) SendEmailToRecoverPassword(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	email := c.QueryParams().Get("email")
+
+	api.useCase.SendEmailRecoverPassword(ctx, email)
+
+	return c.NoContent(http.StatusOK)
+
 }

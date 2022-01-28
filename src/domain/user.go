@@ -3,20 +3,21 @@ package domain
 import (
 	"context"
 
-	"github.com/Fonzeka/Jame/src/utils"
+	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/qiniu/qmgo/field"
 )
 
 type User struct {
 	field.DefaultField `bson:",inline"`
 
-	UserName       string   `bson:"userName"`
-	Password       string   `bson:"password"`
-	FirstName      string   `bson:"firstName"`
-	LastName       string   `bson:"lastName"`
-	Roles          []string `bson:"roles"`
-	DocumentType   int      `bson:"documentType"` //1: DNI
-	DocumentNumber string   `bson:"documentNumber"`
+	UserName             string   `bson:"userName"`
+	Password             string   `bson:"password"`
+	FirstName            string   `bson:"firstName"`
+	LastName             string   `bson:"lastName"`
+	Roles                []string `bson:"roles"`
+	DocumentType         int      `bson:"documentType"` //1: DNI
+	DocumentNumber       string   `bson:"documentNumber"`
+	RecoverPasswordToken string   `bson:"recoverPasswordToken"`
 }
 
 type DocumentType int

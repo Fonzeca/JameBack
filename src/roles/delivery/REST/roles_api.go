@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Fonzeka/Jame/src/domain"
-	"github.com/Fonzeka/Jame/src/roles/usecase"
-	"github.com/Fonzeka/Jame/src/security/jwt"
+	"github.com/Fonzeca/UserHub/src/domain"
+	"github.com/Fonzeca/UserHub/src/roles/usecase"
+	"github.com/Fonzeca/UserHub/src/security/jwt"
 	"github.com/labstack/echo/v4"
 )
 

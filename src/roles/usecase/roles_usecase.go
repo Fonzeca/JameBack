@@ -3,8 +3,8 @@ package usecase
 import (
 	"context"
 
-	"github.com/Fonzeka/Jame/src/domain"
-	"github.com/Fonzeka/Jame/src/utils"
+	"github.com/Fonzeca/UserHub/src/domain"
+	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/thoas/go-funk"
 )
 

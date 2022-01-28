@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Fonzeka/Jame/src/domain"
-	"github.com/Fonzeka/Jame/src/domain/mocks"
-	"github.com/Fonzeka/Jame/src/roles/usecase"
-	"github.com/Fonzeka/Jame/src/utils"
+	"github.com/Fonzeca/UserHub/src/domain"
+	"github.com/Fonzeca/UserHub/src/domain/mocks"
+	"github.com/Fonzeca/UserHub/src/roles/usecase"
+	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

@@ -7,6 +7,7 @@ import (
 
 	"github.com/Fonzeca/UserHub/src/domain"
 	myjwt "github.com/Fonzeca/UserHub/src/security/jwt"
+	"github.com/Fonzeca/UserHub/src/user/delivery/modelview"
 	"github.com/Fonzeca/UserHub/src/user/usecase"
 	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/golang-jwt/jwt"
@@ -33,6 +34,9 @@ func (api *UserApi) Router(e *echo.Echo) {
 	e.GET("/admin/users", api.GetAllusers, myjwt.CheckInRole("admin"))
 
 	e.POST("/public/recoverPassword", api.SendEmailToRecoverPassword)
+	e.GET("/public/validateRecoverToken", api.ValidateRecoverPasswordToken)
+	e.POST("/public/resetPassword", api.ResetPasswordWithToken)
+
 	e.GET("/logged", api.GetUserLogged)
 	e.POST("/validate", api.ValidateToken)
 	e.POST("/login", api.Login)
@@ -149,4 +153,34 @@ func (api *UserApi) SendEmailToRecoverPassword(c echo.Context) error {
 
 	return c.NoContent(http.StatusOK)
 
+}
+
+func (api *UserApi) ValidateRecoverPasswordToken(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	modelview := modelview.ResetPassword{}
+	c.Bind(&modelview)
+
+	_, err := api.useCase.ValidateRecoverPasswordToken(ctx, modelview)
+	if err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (api *UserApi) ResetPasswordWithToken(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	modelview := modelview.ResetPassword{}
+	c.Bind(&modelview)
+
+	err := api.useCase.ResetPasswordWithToken(ctx, modelview)
+	if err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
 }

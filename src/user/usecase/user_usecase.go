@@ -10,6 +10,7 @@ import (
 	"github.com/Fonzeca/UserHub/src/emails"
 	"github.com/Fonzeca/UserHub/src/roles/usecase"
 	myjwt "github.com/Fonzeca/UserHub/src/security/jwt"
+	"github.com/Fonzeca/UserHub/src/user/delivery/modelview"
 	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -183,7 +184,7 @@ func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username st
 	u4 := 1000 + rand.Intn(8999)
 
 	//Hasheamos la pass
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(string(u4)), 8)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(strconv.Itoa(u4)), 8)
 	if err != nil {
 		return err
 	}
@@ -200,5 +201,36 @@ func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username st
 		return err
 	}
 
+	return nil
+}
+
+func (ux *UserUseCase) ValidateRecoverPasswordToken(ctx context.Context, view modelview.ResetPassword) (domain.User, error) {
+	user, err := ux.GetByUserName(ctx, view.Email)
+	if err != nil {
+		return user, err
+	}
+
+	//Comparamos los tokens
+	if err := bcrypt.CompareHashAndPassword([]byte(user.RecoverPasswordToken), []byte(view.Token)); err != nil {
+		return user, utils.ErrOnChangePassword
+	}
+
+	return user, nil
+}
+
+func (ux *UserUseCase) ResetPasswordWithToken(ctx context.Context, view modelview.ResetPassword) error {
+	user, err := ux.ValidateRecoverPasswordToken(ctx, view)
+	if err != nil {
+		return err
+	}
+
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(view.NewPassword), 8)
+	user.Password = string(hashed)
+	user.RecoverPasswordToken = ""
+
+	err = ux.repo.Update(ctx, &user)
+	if err != nil {
+		return err
+	}
 	return nil
 }

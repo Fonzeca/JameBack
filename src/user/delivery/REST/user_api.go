@@ -32,7 +32,7 @@ func (api *UserApi) Router(e *echo.Echo) {
 	e.GET("/admin/user", api.GetUserByUserName, myjwt.CheckInRole("admin"))
 	e.GET("/admin/users", api.GetAllusers, myjwt.CheckInRole("admin"))
 
-	e.POST("/recoverPassword", api.SendEmailToRecoverPassword)
+	e.POST("/public/recoverPassword", api.SendEmailToRecoverPassword)
 	e.GET("/logged", api.GetUserLogged)
 	e.POST("/validate", api.ValidateToken)
 	e.POST("/login", api.Login)

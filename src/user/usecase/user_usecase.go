@@ -2,6 +2,8 @@ package usecase
 
 import (
 	"context"
+	"math/rand"
+	"strconv"
 	"time"
 
 	"github.com/Fonzeca/UserHub/src/domain"
@@ -10,7 +12,6 @@ import (
 	myjwt "github.com/Fonzeca/UserHub/src/security/jwt"
 	"github.com/Fonzeca/UserHub/src/utils"
 	"github.com/golang-jwt/jwt"
-	uuid "github.com/nu7hatch/gouuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -179,13 +180,10 @@ func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username st
 		return err
 	}
 
-	u4, err := uuid.NewV4()
-	if err != nil {
-		return err
-	}
+	u4 := 1000 + rand.Intn(8999)
 
 	//Hasheamos la pass
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u4.String()), 8)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(string(u4)), 8)
 	if err != nil {
 		return err
 	}
@@ -194,7 +192,7 @@ func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username st
 
 	emails.ChannelEmails <- emails.Recuperacion{
 		Email: username,
-		Token: u4.String(),
+		Token: strconv.Itoa(u4),
 	}
 
 	err = ux.repo.Update(ctx, &user)

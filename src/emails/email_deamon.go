@@ -2,8 +2,10 @@ package emails
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/spf13/viper"
 	mail "github.com/xhit/go-simple-mail/v2"
 )
 
@@ -22,10 +24,10 @@ func (ed *EmailDeamon) SendEmailChannel(ch <-chan Recuperacion) {
 	server := mail.NewSMTPClient()
 
 	// SMTP Server
-	server.Host = "c2090187.ferozo.com"
-	server.Port = 465
-	server.Username = "recover@mindiasoft.com"
-	server.Password = "Carmind2022"
+	server.Host = viper.GetString("email.host")
+	server.Port = viper.GetInt("email.port")
+	server.Username = viper.GetString("email.username")
+	server.Password = viper.GetString("email.password")
 	server.Encryption = mail.EncryptionSSL
 
 	server.KeepAlive = false
@@ -43,11 +45,9 @@ func (ed *EmailDeamon) SendEmailChannel(ch <-chan Recuperacion) {
 
 	email_from := "From Example <recover@mindiasoft.com>"
 
-	email_subject := "New Go Email (Prueba del channel)"
+	email_subject := "Recuperacion de contraseña - CarMind"
 
-	email_body := "Hello <b>Alex</b> and <i>Dan</i>!"
-
-	email_file := &mail.File{FilePath: "C:/Users/Alexis Fonzo/Pictures/Yo-en-la-nao.jpeg", Name: "Yo-en-la-nao.jpeg", Inline: true}
+	email_body := "Hola, tu token de recuperacion de contraseña es: <p><h3>{{pass}}</h3></p>"
 
 	for {
 		select {
@@ -55,7 +55,7 @@ func (ed *EmailDeamon) SendEmailChannel(ch <-chan Recuperacion) {
 			if !ok {
 				return
 			}
-			email := ed._createMessage(email_from, email_subject, email_body, to.Token, email_file)
+			email := ed._createMessage(email_from, email_subject, email_body, to.Token, nil)
 			email.AddTo(to.Email)
 
 			err := email.Send(smtpClient)
@@ -71,9 +71,11 @@ func (ed *EmailDeamon) _createMessage(from, subject, body, token string, file *m
 	email.SetFrom(from).
 		SetSubject(subject)
 
-	email.SetBody(mail.TextHTML, body+"  "+token)
+	email.SetBody(mail.TextHTML, strings.Replace(body, "{{pass}}", token, -1))
 
 	// add inline
-	email.Attach(file)
+	if file != nil {
+		email.Attach(file)
+	}
 	return email
 }

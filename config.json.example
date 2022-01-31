@@ -1,0 +1,22 @@
+{
+    "jwt": {
+        "secret": "super-secret",
+        "expiration": "10"
+    },
+    "db": {
+        "url": "182.168.0.1",
+        "port": "27017",
+        "database": "UserHub",
+        "user": "user",
+        "password": "somepassword"
+    },
+    "server": {
+        "port": "5623"
+    },
+    "email": {
+        "host" : "url",
+        "port" : 1122,
+        "username" : "info@lanacion.com",
+        "password" : "somepassword"
+    }
+}

@@ -34,7 +34,7 @@ func (api *UserApi) Router(e *echo.Echo) {
 	e.GET("/admin/users", api.GetAllusers, myjwt.CheckInRole("admin"))
 
 	e.POST("/public/recoverPassword", api.SendEmailToRecoverPassword)
-	e.GET("/public/validateRecoverToken", api.ValidateRecoverPasswordToken)
+	e.POST("/public/validateRecoverToken", api.ValidateRecoverPasswordToken)
 	e.POST("/public/resetPassword", api.ResetPasswordWithToken)
 
 	e.GET("/logged", api.GetUserLogged)

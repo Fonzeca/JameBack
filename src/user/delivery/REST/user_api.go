@@ -149,7 +149,10 @@ func (api *UserApi) SendEmailToRecoverPassword(c echo.Context) error {
 
 	email := c.QueryParams().Get("email")
 
-	api.useCase.SendEmailRecoverPassword(ctx, email)
+	err := api.useCase.SendEmailRecoverPassword(ctx, email)
+	if err != nil {
+		return err
+	}
 
 	return c.NoContent(http.StatusOK)
 

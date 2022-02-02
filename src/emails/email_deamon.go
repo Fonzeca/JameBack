@@ -30,7 +30,7 @@ func (ed *EmailDeamon) SendEmailChannel(ch <-chan Recuperacion) {
 	server.Password = viper.GetString("email.password")
 	server.Encryption = mail.EncryptionSSL
 
-	server.KeepAlive = false
+	server.KeepAlive = true
 
 	// Timeout for connect to SMTP Server
 	server.ConnectTimeout = 10 * time.Second

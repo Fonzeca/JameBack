@@ -10,6 +10,7 @@ import (
 	"github.com/qiniu/qmgo/options"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	opt "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type MongoUserRepository struct {
@@ -20,7 +21,7 @@ func NewMongoUserRepository(db *qmgo.Database) domain.UserRepository {
 	collection := db.Collection("users")
 
 	//Creamos el indice para que el userName no sea duplicado
-	collection.CreateOneIndex(context.TODO(), options.IndexModel{Key: []string{"userName"}, Unique: true})
+	collection.CreateOneIndex(context.TODO(), options.IndexModel{Key: []string{"userName"}, IndexOptions: &opt.IndexOptions{Unique: &[]bool{true}[0]}})
 
 	return &MongoUserRepository{col: collection}
 }

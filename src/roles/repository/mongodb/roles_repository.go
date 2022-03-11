@@ -7,6 +7,7 @@ import (
 	"github.com/qiniu/qmgo"
 	"github.com/qiniu/qmgo/options"
 	"go.mongodb.org/mongo-driver/bson"
+	opt "go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type MongoRolesRepository struct {
@@ -17,7 +18,7 @@ func NewMongoRolesRepository(db *qmgo.Database) domain.RolesRepository {
 	collection := db.Collection("roles")
 
 	//Creamos el indice para que el userName no sea duplicado
-	collection.CreateOneIndex(context.TODO(), options.IndexModel{Key: []string{"name"}, Unique: true})
+	collection.CreateOneIndex(context.TODO(), options.IndexModel{Key: []string{"name"}, IndexOptions: &opt.IndexOptions{Unique: &[]bool{true}[0]}})
 
 	return &MongoRolesRepository{col: collection}
 }

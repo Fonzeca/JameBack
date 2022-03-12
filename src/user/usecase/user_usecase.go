@@ -43,7 +43,7 @@ func validateAdminUser(uc *UserUseCase) {
 		}
 
 		uc.Insert(ctx, &domain.User{
-			UserName:       "afonzo",
+			UserName:       "afonzo@mindia.com.ar",
 			Password:       "123456",
 			FirstName:      "Alexis",
 			LastName:       "Fonzo",

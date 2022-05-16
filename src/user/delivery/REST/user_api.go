@@ -148,8 +148,9 @@ func (api *UserApi) SendEmailToRecoverPassword(c echo.Context) error {
 	defer cancel()
 
 	email := c.QueryParams().Get("email")
+	name := c.QueryParams().Get("name")
 
-	err := api.useCase.SendEmailRecoverPassword(ctx, email)
+	err := api.useCase.SendEmailRecoverPassword(ctx, email, name)
 	if err != nil {
 		return err
 	}

@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Fonzeca/FastEmail/src/sdk"
 	"github.com/Fonzeca/UserHub/src/domain"
-	"github.com/Fonzeca/UserHub/src/emails"
 	"github.com/Fonzeca/UserHub/src/roles/usecase"
 	myjwt "github.com/Fonzeca/UserHub/src/security/jwt"
 	"github.com/Fonzeca/UserHub/src/user/delivery/modelview"
@@ -17,12 +17,13 @@ import (
 )
 
 type UserUseCase struct {
-	repo     domain.UserRepository
-	rolecase usecase.RolesUseCase
+	repo            domain.UserRepository
+	rolecase        usecase.RolesUseCase
+	fastEmailClient *sdk.FastEmailClient
 }
 
-func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase) UserUseCase {
-	uc := UserUseCase{repo: repo, rolecase: roleUsecase}
+func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase, emailClient *sdk.FastEmailClient) UserUseCase {
+	uc := UserUseCase{repo: repo, rolecase: roleUsecase, fastEmailClient: emailClient}
 
 	go validateAdminUser(&uc)
 
@@ -174,7 +175,7 @@ func (ux *UserUseCase) GetUserByToken(ctx context.Context, claims jwt.MapClaims)
 	return user, nil
 }
 
-func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username string) error {
+func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username string, name string) error {
 
 	user, err := ux.GetByUserName(ctx, username)
 	if err != nil {
@@ -191,9 +192,9 @@ func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username st
 
 	user.RecoverPasswordToken = string(hashedPassword)
 
-	emails.ChannelEmails <- emails.Recuperacion{
-		Email: username,
-		Token: strconv.Itoa(u4),
+	err = ux.fastEmailClient.SendRecoverPassword(username, user.FirstName, strconv.Itoa(u4))
+	if err != nil {
+		return err
 	}
 
 	err = ux.repo.Update(ctx, &user)

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/Fonzeca/UserHub/src/emails"
+	"github.com/Fonzeca/FastEmail/src/sdk"
 	_RESTrole "github.com/Fonzeca/UserHub/src/roles/delivery/REST"
 	_mongoroles "github.com/Fonzeca/UserHub/src/roles/repository/mongodb"
 	_usecaseroles "github.com/Fonzeca/UserHub/src/roles/usecase"
@@ -21,10 +21,13 @@ import (
 
 func main() {
 
-	utils.InitConfig()
+	fastEmailConfig := sdk.Config{
+		Url: viper.GetString("fast-email.url"),
+	}
 
-	deamon := &emails.EmailDeamon{}
-	deamon.Init()
+	client := sdk.NewEmailClient(fastEmailConfig)
+
+	utils.InitConfig()
 
 	db, _ := initDataBase()
 
@@ -32,7 +35,7 @@ func main() {
 	repousers := _mongouser.NewMongoUserRepository(db)
 
 	repoUseCase := _usecaseroles.NewRolesUseCase(reporoles)
-	userUseCase := _usecaseuser.NewUserUseCase(repousers, repoUseCase)
+	userUseCase := _usecaseuser.NewUserUseCase(repousers, repoUseCase, &client)
 
 	rolesApi := _RESTrole.NewuserApi(repoUseCase)
 	userApi := _RESTuser.NewuserApi(userUseCase)

@@ -20,14 +20,13 @@ import (
 )
 
 func main() {
+	utils.InitConfig()
 
 	fastEmailConfig := sdk.Config{
 		Url: viper.GetString("fast-email.url"),
 	}
 
 	client := sdk.NewEmailClient(fastEmailConfig)
-
-	utils.InitConfig()
 
 	db, _ := initDataBase()
 

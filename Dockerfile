@@ -16,6 +16,4 @@ EXPOSE 5623
 
 # EXPOSE 465
 
-WORKDIR /user_hub
-
 CMD [ "./executable", "server" ]

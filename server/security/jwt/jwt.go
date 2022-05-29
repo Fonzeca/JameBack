@@ -11,7 +11,6 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
-	"github.com/thoas/go-funk"
 )
 
 type jwtCustomClaims struct {
@@ -67,9 +66,40 @@ func parseToken(token *jwt.Token) (interface{}, error) {
 	return []byte(secret), nil
 }
 
+func ValidateAuth(c echo.Context) (jwt.MapClaims, error) {
+	authorization := c.Request().Header.Get("Authorization")
+
+	re := regexp.MustCompile("Bearer (.+)")
+
+	if !re.MatchString(authorization) {
+		return nil, utils.ErrNoBearerToken
+	}
+
+	recivedToken := re.FindStringSubmatch(authorization)[1]
+
+	token, err := jwt.Parse(recivedToken, parseToken)
+	if err != nil {
+		return nil, utils.ErrExpiredToken
+	}
+
+	if !token.Valid {
+		return nil, utils.ErrExpiredToken
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	if ok {
+		c.Set("claims", claims)
+	} else {
+		return nil, utils.ErrExpiredToken
+	}
+	return claims, nil
+}
+
 // Middeware para chequear que el usuario este logueado
 // Se setea los claims para que lo use otro middeware
-func CheckLogged(next echo.HandlerFunc) echo.HandlerFunc {
+// @Deprecated
+func CheckLogged_old(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		if !strings.Contains(c.Path(), "login") && !strings.Contains(c.Path(), "public") {
 
@@ -102,28 +132,28 @@ func CheckLogged(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func CheckInRole(pRolesName ...string) echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			if claims, ok := c.Get("claims").(jwt.MapClaims); ok {
-				interfaces := claims["roles"].([]interface{})
+// func CheckInRole(pRolesName ...string) echo.MiddlewareFunc {
+// 	return func(next echo.HandlerFunc) echo.HandlerFunc {
+// 		return func(c echo.Context) error {
+// 			if claims, ok := c.Get("claims").(jwt.MapClaims); ok {
+// 				interfaces := claims["roles"].([]interface{})
 
-				var roles []string
+// 				var roles []string
 
-				funk.ForEach(interfaces, func(x interface{}) {
-					roles = append(roles, x.(string))
-				})
+// 				funk.ForEach(interfaces, func(x interface{}) {
+// 					roles = append(roles, x.(string))
+// 				})
 
-				intersect := funk.IntersectString(pRolesName, roles)
+// 				intersect := funk.IntersectString(pRolesName, roles)
 
-				if len(intersect) > 0 {
-					return next(c)
-				}
+// 				if len(intersect) > 0 {
+// 					return next(c)
+// 				}
 
-				return utils.ErrUnauthorized
-			}
+// 				return utils.ErrUnauthorized
+// 			}
 
-			return next(c)
-		}
-	}
-}
+// 			return next(c)
+// 		}
+// 	}
+// }

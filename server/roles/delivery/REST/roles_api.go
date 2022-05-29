@@ -7,7 +7,6 @@ import (
 
 	"github.com/Fonzeca/UserHub/server/domain"
 	"github.com/Fonzeca/UserHub/server/roles/usecase"
-	"github.com/Fonzeca/UserHub/server/security/jwt"
 	"github.com/labstack/echo/v4"
 )
 
@@ -22,9 +21,9 @@ func NewuserApi(useCase usecase.RolesUseCase) *RolesApi {
 
 //Router
 func (api *RolesApi) Router(e *echo.Echo) {
-	e.POST("/admin/role", api.InsertRole, jwt.CheckInRole("admin"))
-	e.DELETE("/admin/role", api.DeleteRole, jwt.CheckInRole("admin"))
-	e.GET("/admin/roles", api.GetAllRoles, jwt.CheckInRole("admin"))
+	e.POST("/admin/role", api.InsertRole)
+	e.DELETE("/admin/role", api.DeleteRole)
+	e.GET("/admin/roles", api.GetAllRoles)
 }
 
 //Handlers ---------------

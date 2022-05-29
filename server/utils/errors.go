@@ -22,6 +22,8 @@ var (
 	ErrOnInsertNoDocument = NewHTTPError(http.StatusBadRequest, "10-DTE", "Document type empty")
 
 	ErrOnChangePassword = NewHTTPError(http.StatusConflict, "11-IT", "Incorrect token")
+
+	ErrNoBearerToken = NewHTTPError(http.StatusBadRequest, "12-TNF", "Token not found")
 )
 
 func ErrNoValidRole(roleName string) error {

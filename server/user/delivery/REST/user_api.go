@@ -6,11 +6,10 @@ import (
 	"time"
 
 	"github.com/Fonzeca/UserHub/server/domain"
-	myjwt "github.com/Fonzeca/UserHub/server/security/jwt"
+	our_jwt "github.com/Fonzeca/UserHub/server/security/jwt"
 	"github.com/Fonzeca/UserHub/server/user/delivery/modelview"
 	"github.com/Fonzeca/UserHub/server/user/usecase"
 	"github.com/Fonzeca/UserHub/server/utils"
-	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 )
 
@@ -28,10 +27,10 @@ func NewuserApi(useCase usecase.UserUseCase) *UserApi {
 //Router
 func (api *UserApi) Router(e *echo.Echo) {
 
-	e.POST("/admin/user", api.InsertOne, myjwt.CheckInRole("admin"))
-	e.PUT("/admin/user", api.UpdateOne, myjwt.CheckInRole("admin"))
-	e.GET("/admin/user", api.GetUserByUserName, myjwt.CheckInRole("admin"))
-	e.GET("/admin/users", api.GetAllusers, myjwt.CheckInRole("admin"))
+	e.POST("/admin/user", api.InsertOne)
+	e.PUT("/admin/user", api.UpdateOne)
+	e.GET("/admin/user", api.GetUserByUserName)
+	e.GET("/admin/users", api.GetAllusers)
 
 	e.POST("/public/recoverPassword", api.SendEmailToRecoverPassword)
 	e.POST("/public/validateRecoverToken", api.ValidateRecoverPasswordToken)
@@ -124,6 +123,10 @@ func (api *UserApi) UpdateOne(c echo.Context) error {
 }
 
 func (api *UserApi) ValidateToken(c echo.Context) error {
+	_, err := our_jwt.ValidateAuth(c)
+	if err != nil {
+		return err
+	}
 	return c.NoContent(http.StatusOK)
 }
 
@@ -131,16 +134,17 @@ func (api *UserApi) GetUserLogged(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	if claims, ok := c.Get("claims").(jwt.MapClaims); ok {
-		user, err := api.useCase.GetUserByToken(ctx, claims)
-
-		if err != nil {
-			return err
-		}
-		return c.JSON(http.StatusOK, user)
+	claims, err := our_jwt.ValidateAuth(c)
+	if err != nil {
+		return err
 	}
 
-	return c.NoContent(http.StatusNotFound)
+	user, err := api.useCase.GetUserByToken(ctx, claims)
+
+	if err != nil {
+		return err
+	}
+	return c.JSON(http.StatusOK, user)
 }
 
 func (api *UserApi) SendEmailToRecoverPassword(c echo.Context) error {

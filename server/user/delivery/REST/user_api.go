@@ -29,6 +29,7 @@ func (api *UserApi) Router(e *echo.Echo) {
 
 	e.POST("/admin/user", api.InsertOne)
 	e.PUT("/admin/user", api.UpdateOne)
+	e.DELETE("/admin/user", api.DeleteOne)
 	e.GET("/admin/user", api.GetUserByUserName)
 	e.GET("/admin/users", api.GetAllusers)
 
@@ -115,6 +116,20 @@ func (api *UserApi) UpdateOne(c echo.Context) error {
 	c.Bind(&user)
 
 	err := api.useCase.Update(ctx, &user)
+	if err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (api *UserApi) DeleteOne(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	username := c.QueryParams().Get("username")
+
+	err := api.useCase.Delete(ctx, username)
 	if err != nil {
 		return err
 	}

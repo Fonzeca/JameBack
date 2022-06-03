@@ -39,11 +39,13 @@ func (api *UserApi) Router(e *echo.Echo) {
 
 	e.GET("/logged", api.GetUserLogged)
 	e.POST("/validate", api.ValidateToken)
+	e.POST("/firstLoginResetPassword", api.FirstLoginResetPassword)
 	e.POST("/login", api.Login)
 }
 
 //Handlers ---------------
 
+//Login de usuarios
 func (api *UserApi) Login(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -60,9 +62,10 @@ func (api *UserApi) Login(c echo.Context) error {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, json{"token": token})
+	return c.JSON(http.StatusOK, token)
 }
 
+// Insertar un usuario
 func (api *UserApi) InsertOne(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -78,6 +81,7 @@ func (api *UserApi) InsertOne(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+//Get usuario by username
 func (api *UserApi) GetUserByUserName(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -96,6 +100,7 @@ func (api *UserApi) GetUserByUserName(c echo.Context) error {
 	return c.JSON(http.StatusOK, usr)
 }
 
+//Get all users
 func (api *UserApi) GetAllusers(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -108,6 +113,7 @@ func (api *UserApi) GetAllusers(c echo.Context) error {
 	return c.JSON(http.StatusOK, users)
 }
 
+//Editar un usuario
 func (api *UserApi) UpdateOne(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -123,6 +129,7 @@ func (api *UserApi) UpdateOne(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+//Borrar un usuario
 func (api *UserApi) DeleteOne(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -137,7 +144,9 @@ func (api *UserApi) DeleteOne(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+//Valida el token
 func (api *UserApi) ValidateToken(c echo.Context) error {
+	//Obtenemos los claims del token del header
 	_, err := our_jwt.ValidateAuth(c)
 	if err != nil {
 		return err
@@ -145,10 +154,12 @@ func (api *UserApi) ValidateToken(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+//Obtiene un usuario logueado
 func (api *UserApi) GetUserLogged(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
+	//Obtenemos los claims del token del header
 	claims, err := our_jwt.ValidateAuth(c)
 	if err != nil {
 		return err
@@ -162,6 +173,7 @@ func (api *UserApi) GetUserLogged(c echo.Context) error {
 	return c.JSON(http.StatusOK, user)
 }
 
+//Envia el email para recuperar la contraseña
 func (api *UserApi) SendEmailToRecoverPassword(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -178,6 +190,7 @@ func (api *UserApi) SendEmailToRecoverPassword(c echo.Context) error {
 
 }
 
+//TODO: borrar
 func (api *UserApi) ValidateRecoverPasswordToken(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -193,6 +206,7 @@ func (api *UserApi) ValidateRecoverPasswordToken(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+//Resetea la contraseña con el token
 func (api *UserApi) ResetPasswordWithToken(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -201,6 +215,24 @@ func (api *UserApi) ResetPasswordWithToken(c echo.Context) error {
 	c.Bind(&modelview)
 
 	err := api.useCase.ResetPasswordWithToken(ctx, modelview)
+	if err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+func (api *UserApi) FirstLoginResetPassword(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	//Obtenemos la nueva contraseña
+	newPass := c.QueryParam("newPassword")
+
+	//El usuario a cambiar la contraseña
+	username := c.QueryParam("username")
+
+	err := api.useCase.NewPasswordFirstLogin(ctx, username, newPass)
 	if err != nil {
 		return err
 	}

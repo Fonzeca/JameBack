@@ -18,6 +18,7 @@ type User struct {
 	DocumentType         int      `bson:"documentType"` //1: DNI
 	DocumentNumber       string   `bson:"documentNumber"`
 	RecoverPasswordToken string   `bson:"recoverPasswordToken"`
+	HadPasswordChange    bool     `bson:"hadPasswordChange"`
 }
 
 type DocumentType int

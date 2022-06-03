@@ -4,7 +4,6 @@ import (
 	"context"
 	"math/rand"
 	"strconv"
-	"time"
 
 	"github.com/Fonzeca/FastEmail/src/sdk"
 	"github.com/Fonzeca/UserHub/server/domain"
@@ -24,35 +23,7 @@ type UserUseCase struct {
 
 func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase, emailClient *sdk.FastEmailClient) UserUseCase {
 	uc := UserUseCase{repo: repo, rolecase: roleUsecase, fastEmailClient: emailClient}
-
-	go validateAdminUser(&uc)
-
 	return uc
-}
-
-func validateAdminUser(uc *UserUseCase) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	data, _ := uc.GetAll(ctx)
-	if len(data) <= 0 {
-		data2, _ := uc.rolecase.GetAllRoles(ctx)
-		if len(data2) <= 0 {
-			uc.rolecase.InsertRole(ctx, domain.Role{
-				Name: "admin",
-			})
-		}
-
-		uc.Insert(ctx, &domain.User{
-			UserName:       "afonzo@mindia.com.ar",
-			Password:       "123456",
-			FirstName:      "Alexis",
-			LastName:       "Fonzo",
-			DocumentType:   1,
-			DocumentNumber: "38096937",
-			Roles:          []string{"admin"},
-		})
-	}
 }
 
 // Obtiene el usuario por el nombre de usuario
@@ -138,27 +109,34 @@ func (ux *UserUseCase) Delete(ctx context.Context, UserName string) error {
 }
 
 // Metodo de login
-func (ux *UserUseCase) Login(ctx context.Context, userName string, password string) (string, error) {
+func (ux *UserUseCase) Login(ctx context.Context, userName string, password string) (*modelview.Token, error) {
 	//Buscamos un usuario con el mismo userName
 	user, err := ux.repo.GetByUserName(ctx, userName)
 
 	if err != nil {
 		//Si no lo encuentra
-		return "", utils.ErrTryLogin
+		return nil, utils.ErrTryLogin
 	}
 
 	//Comparamos la pass
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return "", utils.ErrTryLogin
+		return nil, utils.ErrTryLogin
 	}
 
 	// Generamos el token
 	token, err := myjwt.GenerateToken(&user)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return token, nil
+	changePassword := !user.HadPasswordChange
+
+	tokOb := &modelview.Token{
+		Token:              token,
+		MustChangePassword: changePassword,
+	}
+
+	return tokOb, nil
 }
 
 func (ux *UserUseCase) GetUserByToken(ctx context.Context, claims jwt.MapClaims) (domain.User, error) {
@@ -228,6 +206,32 @@ func (ux *UserUseCase) ResetPasswordWithToken(ctx context.Context, view modelvie
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(view.NewPassword), 8)
 	user.Password = string(hashed)
 	user.RecoverPasswordToken = ""
+
+	err = ux.repo.Update(ctx, &user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ux *UserUseCase) NewPasswordFirstLogin(ctx context.Context, username string, newPass string) error {
+	user, err := ux.GetByUserName(ctx, username)
+	if err != nil {
+		return err
+	}
+
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(newPass), 8)
+
+	if user.Password == string(hashed) {
+		return utils.ErrSamePassword
+	}
+
+	if user.HadPasswordChange {
+		return utils.ErrHasChangedPassword
+	}
+
+	user.Password = string(hashed)
+	user.HadPasswordChange = true
 
 	err = ux.repo.Update(ctx, &user)
 	if err != nil {

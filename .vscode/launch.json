@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceRoot}/main.go",
-            "args": ["apikey","new", "--client", "test2"]
+            "args": ["server"]
         },
         {
             "name": "Test current file",

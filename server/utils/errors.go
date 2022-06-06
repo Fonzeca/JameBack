@@ -24,6 +24,10 @@ var (
 	ErrOnChangePassword = NewHTTPError(http.StatusConflict, "11-IT", "Incorrect token")
 
 	ErrNoBearerToken = NewHTTPError(http.StatusBadRequest, "12-TNF", "Token not found")
+
+	ErrSamePassword = NewHTTPError(http.StatusConflict, "13-SP", "La nueva contraseña es igual a la contraseña actual")
+
+	ErrHasChangedPassword = NewHTTPError(http.StatusBadRequest, "14-SP", "El usuario ya tuve su primer cambio de contraseña")
 )
 
 func ErrNoValidRole(roleName string) error {

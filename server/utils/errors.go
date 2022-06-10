@@ -3,27 +3,27 @@ package utils
 import "net/http"
 
 var (
-	ErrUserNotFound = NewHTTPError(http.StatusNotFound, "1-UNF", "User not found")
+	ErrUserNotFound = NewHTTPError(http.StatusNotFound, "1-UNF", "No se encontro el usuario")
 
-	ErrInternalError = NewHTTPError(http.StatusInternalServerError, "2-GEM", "Internal server error")
+	ErrInternalError = NewHTTPError(http.StatusInternalServerError, "2-GEM", "Algo paso con el servidor")
 
-	ErrTryLogin = NewHTTPError(http.StatusBadRequest, "3-UNA", "Username or password incorrect")
+	ErrTryLogin = NewHTTPError(http.StatusBadRequest, "3-UNA", "Email o contraseña incorrecta")
 
-	ErrBadRequest = NewHTTPError(http.StatusBadRequest, "4-BR", "Bad request")
+	ErrBadRequest = NewHTTPError(http.StatusBadRequest, "4-BR", "Formato de llamada incorrecto")
 
-	ErrUnauthorized = NewHTTPError(http.StatusUnauthorized, "5-UN", "Unauthorized")
+	ErrUnauthorized = NewHTTPError(http.StatusUnauthorized, "5-UN", "Privilegios incorrectos")
 
-	ErrExpiredToken = NewHTTPError(http.StatusUnauthorized, "6-ET", "Expired token")
+	ErrExpiredToken = NewHTTPError(http.StatusUnauthorized, "6-ET", "Sesion expirada")
 
-	ErrOnInsertNoUsername = NewHTTPError(http.StatusBadRequest, "8-UNE", "Username empty")
+	ErrOnInsertNoUsername = NewHTTPError(http.StatusBadRequest, "8-UNE", "Email vacio")
 
-	ErrOnInsertNoPassword = NewHTTPError(http.StatusBadRequest, "9-PE", "Password empty")
+	ErrOnInsertNoPassword = NewHTTPError(http.StatusBadRequest, "9-PE", "Contraseña vacia")
 
-	ErrOnInsertNoDocument = NewHTTPError(http.StatusBadRequest, "10-DTE", "Document type empty")
+	ErrOnInsertNoDocument = NewHTTPError(http.StatusBadRequest, "10-DTE", "Tipo de documento vacio")
 
-	ErrOnChangePassword = NewHTTPError(http.StatusConflict, "11-IT", "Incorrect token")
+	ErrOnChangePassword = NewHTTPError(http.StatusConflict, "11-IT", "Codigo incorrecto")
 
-	ErrNoBearerToken = NewHTTPError(http.StatusBadRequest, "12-TNF", "Token not found")
+	ErrNoBearerToken = NewHTTPError(http.StatusBadRequest, "12-TNF", "Sesion malformada")
 
 	ErrSamePassword = NewHTTPError(http.StatusConflict, "13-SP", "La nueva contraseña es igual a la contraseña actual")
 
@@ -31,5 +31,5 @@ var (
 )
 
 func ErrNoValidRole(roleName string) error {
-	return NewHTTPError(http.StatusBadRequest, "7-NVR", "No valid role: "+roleName)
+	return NewHTTPError(http.StatusBadRequest, "7-NVR", "Rol invalido: "+roleName)
 }

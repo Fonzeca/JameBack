@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/rand"
 	"strconv"
+	"time"
 
 	"github.com/Fonzeca/FastEmail/src/sdk"
 	"github.com/Fonzeca/UserHub/server/domain"
@@ -232,6 +233,22 @@ func (ux *UserUseCase) NewPasswordFirstLogin(ctx context.Context, username strin
 
 	user.Password = string(hashed)
 	user.HadPasswordChange = true
+
+	err = ux.repo.Update(ctx, &user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ux *UserUseCase) SaveFCMToken(ctx context.Context, username string, FCMToken string) error {
+	user, err := ux.GetByUserName(ctx, username)
+	if err != nil {
+		return err
+	}
+
+	user.FCMToken = FCMToken
+	user.FCMCreateTimeStamp = strconv.FormatInt(time.Now().Unix(), 10)
 
 	err = ux.repo.Update(ctx, &user)
 	if err != nil {

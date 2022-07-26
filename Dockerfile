@@ -10,8 +10,8 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /user_hub .
+RUN go build -o /user_hub/user_hub .
 
 EXPOSE 5623
 
-CMD [ "/user_hub", "server" ]
+ENTRYPOINT [ "./user_hub", "server" ]

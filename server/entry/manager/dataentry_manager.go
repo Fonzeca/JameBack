@@ -37,12 +37,12 @@ func (d *DataEntryManager) ProcessData(data data_json.ZoneNotification) error {
 	data.FCMTokens = FCMTokens
 
 	zoneNotificationBytes, _ := jsonEncoder.Marshal(data)
-	err := services.GlobalChannel.PublishWithContext(context.Background(), "carmind", "notification.zone.fastemail.ready", true, true, amqp091.Publishing{
+	err := services.GlobalChannel.PublishWithContext(context.Background(), "carmind", "notification.zone.fastemail.ready", false, false, amqp091.Publishing{
 		ContentType: "application/json",
 		Body:        zoneNotificationBytes,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 	}
 
 	return err

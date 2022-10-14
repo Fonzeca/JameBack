@@ -256,3 +256,16 @@ func (ux *UserUseCase) SaveFCMToken(ctx context.Context, username string, FCMTok
 	}
 	return nil
 }
+
+func (ux *UserUseCase) GetTokensByTokenUsers(userNames []string, ctx context.Context) ([]struct {
+	FCMToken string `bson:"FCMToken"`
+}, error) {
+
+	//Buscamos tokens con los usernames que nos llegan desde rabbit
+	fcmTokens, err := ux.repo.GetFCMTokensByUserNames(ctx, userNames)
+	if err != nil {
+		return fcmTokens, err
+	}
+
+	return fcmTokens, err
+}

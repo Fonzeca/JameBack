@@ -49,6 +49,9 @@ func (u *User) ValidateData() error {
 type UserRepository interface {
 	GetAll(ctx context.Context) ([]User, error)
 	GetByUserName(ctx context.Context, userName string) (User, error)
+	GetFCMTokensByUserNames(ctx context.Context, userNames []string) ([]struct {
+		FCMToken string `bson:"FCMToken"`
+	}, error)
 	Insert(ctx context.Context, user *User) (User, error)
 	Update(ctx context.Context, user *User) error
 	Delete(ctx context.Context, UserName string) error

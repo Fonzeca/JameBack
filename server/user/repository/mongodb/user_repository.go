@@ -63,3 +63,20 @@ func (r *MongoUserRepository) GetByUserName(ctx context.Context, userName string
 
 	return user, nil
 }
+
+func (r *MongoUserRepository) GetFCMTokensByUserNames(ctx context.Context, userNames []string) ([]struct {
+	FCMToken string `bson:"FCMToken"`
+}, error) {
+
+	var tokens []struct {
+		FCMToken string `bson:"FCMToken"`
+	}
+
+	err := r.col.Find(ctx, bson.M{"userName": bson.M{"$in": userNames}}).Select(bson.M{"FCMToken": 1}).All(&tokens)
+
+	if err != nil {
+		return tokens, utils.ErrUserNotFound
+	}
+
+	return tokens, err
+}

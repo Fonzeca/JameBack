@@ -2,6 +2,9 @@ package usecase_test
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/Fonzeca/UserHub/server/domain"
@@ -9,6 +12,7 @@ import (
 	_rolesUseCase "github.com/Fonzeca/UserHub/server/roles/usecase"
 	_userUseCase "github.com/Fonzeca/UserHub/server/user/usecase"
 	"github.com/Fonzeca/UserHub/server/utils"
+	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
@@ -19,9 +23,9 @@ func TestCreateUser(t *testing.T) {
 	mockRoleRepo := new(mocks.RolesRepository)
 	ru := _rolesUseCase.NewRolesUseCase(mockRoleRepo)
 
-	mockUserRepo.On("GetAll", mock.Anything).Return([]domain.User{
-		domain.User{},
-	}, nil)
+	// mockUserRepo.On("GetAll", mock.Anything).Return([]domain.User{
+	// 	domain.User{},
+	// }, nil)
 	u := _userUseCase.NewUserUseCase(mockUserRepo, ru, nil)
 
 	var createUserTests = []struct {
@@ -88,9 +92,9 @@ func TestLogin(t *testing.T) {
 	mockRoleRepo := new(mocks.RolesRepository)
 	ru := _rolesUseCase.NewRolesUseCase(mockRoleRepo)
 
-	mockUserRepo.On("GetAll", mock.Anything).Return([]domain.User{
-		domain.User{},
-	}, nil)
+	// mockUserRepo.On("GetAll", mock.Anything).Return([]domain.User{
+	// 	domain.User{},
+	// }, nil)
 	u := _userUseCase.NewUserUseCase(mockUserRepo, ru, nil)
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("12345"), 8)
@@ -143,7 +147,14 @@ func TestLogin(t *testing.T) {
 
 			x.prepare(&mockUserRepo.Mock, &mockRoleRepo.Mock)
 
-			token, err := u.Login(context.TODO(), x.userName, x.password)
+			// Setup
+			e := echo.New()
+			req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(""))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+
+			token, err := u.Login(context.TODO(), x.userName, x.password, c)
 
 			if x.errorExpected != nil {
 				assert.Error(t, err)
@@ -153,6 +164,10 @@ func TestLogin(t *testing.T) {
 				assert.NoError(t, err)
 				assert.NotNil(t, token)
 				assert.NotEmpty(t, token)
+
+				cookies := rec.Result().Cookies()
+				assert.NotEmpty(t, cookies)
+				assert.Equal(t, cookies[0].Name, "session")
 			}
 
 			mockUserRepo.AssertExpectations(t)

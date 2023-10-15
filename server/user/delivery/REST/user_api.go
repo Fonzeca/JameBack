@@ -19,12 +19,12 @@ type UserApi struct {
 
 type json map[string]interface{}
 
-//Constructor
+// Constructor
 func NewuserApi(useCase usecase.UserUseCase) *UserApi {
 	return &UserApi{useCase: useCase}
 }
 
-//Router
+// Router
 func (api *UserApi) Router(e *echo.Echo) {
 
 	e.POST("/admin/user", api.InsertOne)
@@ -45,7 +45,7 @@ func (api *UserApi) Router(e *echo.Echo) {
 
 //Handlers ---------------
 
-//Login de usuarios
+// Login de usuarios
 func (api *UserApi) Login(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -56,7 +56,7 @@ func (api *UserApi) Login(c echo.Context) error {
 	userName := user.UserName
 	password := user.Password
 
-	token, err := api.useCase.Login(ctx, userName, password)
+	token, err := api.useCase.Login(ctx, userName, password, c)
 
 	if err != nil {
 		return err
@@ -81,7 +81,7 @@ func (api *UserApi) InsertOne(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-//Get usuario by username
+// Get usuario by username
 func (api *UserApi) GetUserByUserName(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -100,7 +100,7 @@ func (api *UserApi) GetUserByUserName(c echo.Context) error {
 	return c.JSON(http.StatusOK, usr)
 }
 
-//Get all users
+// Get all users
 func (api *UserApi) GetAllusers(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -113,7 +113,7 @@ func (api *UserApi) GetAllusers(c echo.Context) error {
 	return c.JSON(http.StatusOK, users)
 }
 
-//Editar un usuario
+// Editar un usuario
 func (api *UserApi) UpdateOne(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -129,7 +129,7 @@ func (api *UserApi) UpdateOne(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-//Borrar un usuario
+// Borrar un usuario
 func (api *UserApi) DeleteOne(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -144,7 +144,7 @@ func (api *UserApi) DeleteOne(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-//Valida el token
+// Valida el token
 func (api *UserApi) ValidateToken(c echo.Context) error {
 	//Obtenemos los claims del token del header
 	_, err := our_jwt.ValidateAuth(c)
@@ -154,7 +154,7 @@ func (api *UserApi) ValidateToken(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-//Obtiene un usuario logueado
+// Obtiene un usuario logueado
 func (api *UserApi) GetUserLogged(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -173,7 +173,7 @@ func (api *UserApi) GetUserLogged(c echo.Context) error {
 	return c.JSON(http.StatusOK, user)
 }
 
-//Envia el email para recuperar la contraseña
+// Envia el email para recuperar la contraseña
 func (api *UserApi) SendEmailToRecoverPassword(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -190,7 +190,7 @@ func (api *UserApi) SendEmailToRecoverPassword(c echo.Context) error {
 
 }
 
-//TODO: borrar
+// TODO: borrar
 func (api *UserApi) ValidateRecoverPasswordToken(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -206,7 +206,7 @@ func (api *UserApi) ValidateRecoverPasswordToken(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
-//Resetea la contraseña con el token
+// Resetea la contraseña con el token
 func (api *UserApi) ResetPasswordWithToken(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()

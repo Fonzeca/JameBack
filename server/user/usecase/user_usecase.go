@@ -3,7 +3,9 @@ package usecase
 import (
 	"context"
 	"math/rand"
+	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/Fonzeca/FastEmail/src/sdk"
 	"github.com/Fonzeca/UserHub/server/domain"
@@ -12,6 +14,8 @@ import (
 	"github.com/Fonzeca/UserHub/server/user/delivery/modelview"
 	"github.com/Fonzeca/UserHub/server/utils"
 	"github.com/golang-jwt/jwt"
+	"github.com/labstack/echo/v4"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -109,7 +113,7 @@ func (ux *UserUseCase) Delete(ctx context.Context, UserName string) error {
 }
 
 // Metodo de login
-func (ux *UserUseCase) Login(ctx context.Context, userName string, password string) (*modelview.Token, error) {
+func (ux *UserUseCase) Login(ctx context.Context, userName string, password string, echoCtx echo.Context) (*modelview.Token, error) {
 	//Buscamos un usuario con el mismo userName
 	user, err := ux.repo.GetByUserName(ctx, userName)
 
@@ -134,6 +138,29 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 	tokOb := &modelview.Token{
 		Token:              token,
 		MustChangePassword: changePassword,
+	}
+
+	exiprationMinutes := viper.GetDuration("jwt.expiration")
+
+	isDev := viper.GetString("enviroment") == "dev"
+
+	//Seteamos la cookie
+	cookie := &http.Cookie{
+		Name:     "session",
+		Value:    token,
+		Path:     "/",
+		Expires:  time.Now().Add(time.Minute * exiprationMinutes),
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
+
+	if isDev {
+		cookie.Domain = "dev.carmind-app.com"
+	}
+
+	if echoCtx != nil {
+		echoCtx.SetCookie(cookie)
 	}
 
 	return tokOb, nil

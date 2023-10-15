@@ -1,4 +1,5 @@
 {
+    "enviroment" : "dev",
     "jwt": {
         "secret": "super-secret",
         "expiration": "10"

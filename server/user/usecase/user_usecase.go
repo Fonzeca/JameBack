@@ -266,3 +266,32 @@ func (ux *UserUseCase) NewPasswordFirstLogin(ctx context.Context, username strin
 	}
 	return nil
 }
+
+func (ux *UserUseCase) SaveFCMToken(ctx context.Context, username string, FCMToken string) error {
+	user, err := ux.GetByUserName(ctx, username)
+	if err != nil {
+		return err
+	}
+
+	user.FCMToken = FCMToken
+	user.FCMCreateTimeStamp = strconv.FormatInt(time.Now().Unix(), 10)
+
+	err = ux.repo.Update(ctx, &user)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ux *UserUseCase) GetTokensByTokenUsers(userNames []string, ctx context.Context) ([]struct {
+	FCMToken string `bson:"FCMToken"`
+}, error) {
+
+	//Buscamos tokens con los usernames que nos llegan desde rabbit
+	fcmTokens, err := ux.repo.GetFCMTokensByUserNames(ctx, userNames)
+	if err != nil {
+		return fcmTokens, err
+	}
+
+	return fcmTokens, err
+}

@@ -6,9 +6,12 @@ import (
 
 	"github.com/Fonzeca/FastEmail/src/sdk"
 	guard_userhub "github.com/Fonzeca/UserHub/guard"
+	"github.com/Fonzeca/UserHub/server/entry"
+	"github.com/Fonzeca/UserHub/server/entry/manager"
 	_RESTrole "github.com/Fonzeca/UserHub/server/roles/delivery/REST"
 	_mongoroles "github.com/Fonzeca/UserHub/server/roles/repository/mongodb"
 	_usecaseroles "github.com/Fonzeca/UserHub/server/roles/usecase"
+	"github.com/Fonzeca/UserHub/server/services"
 	_RESTuser "github.com/Fonzeca/UserHub/server/user/delivery/REST"
 	_mongouser "github.com/Fonzeca/UserHub/server/user/repository/mongodb"
 	_usecaseuser "github.com/Fonzeca/UserHub/server/user/usecase"
@@ -23,6 +26,9 @@ var Db *qmgo.Database
 var Guard *guard_userhub.Guard
 
 func InitServer() {
+	_, closeFunc := services.SetupRabbitMq()
+	defer closeFunc()
+
 	fastEmailConfig := sdk.Config{
 		Url: viper.GetString("fast-email.url"),
 	}
@@ -31,6 +37,9 @@ func InitServer() {
 
 	reporoles := _mongoroles.NewMongoRolesRepository(Db)
 	repousers := _mongouser.NewMongoUserRepository(Db)
+
+	entry.DataEntryManager = manager.NewDataEntryManager(repousers)
+	entry.NewRabbitMqDataEntry()
 
 	repoUseCase := _usecaseroles.NewRolesUseCase(reporoles)
 	userUseCase := _usecaseuser.NewUserUseCase(repousers, repoUseCase, &client)

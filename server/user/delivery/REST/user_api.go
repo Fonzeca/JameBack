@@ -32,6 +32,7 @@ func (api *UserApi) Router(e *echo.Echo) {
 	e.DELETE("/admin/user", api.DeleteOne)
 	e.GET("/admin/user", api.GetUserByUserName)
 	e.GET("/admin/users", api.GetAllusers)
+	e.POST("/admin/saveFCMToken", api.SaveFCMToken)
 
 	e.POST("/public/recoverPassword", api.SendEmailToRecoverPassword)
 	e.POST("/public/validateRecoverToken", api.ValidateRecoverPasswordToken)
@@ -55,11 +56,20 @@ func (api *UserApi) Login(c echo.Context) error {
 
 	userName := user.UserName
 	password := user.Password
+	FCMToken := user.FCMToken
 
 	token, err := api.useCase.Login(ctx, userName, password, c)
 
 	if err != nil {
 		return err
+	}
+
+	//Si nos dan el token, lo guardamos
+	if len(FCMToken) > 0 {
+		err = api.useCase.SaveFCMToken(ctx, userName, FCMToken)
+		if err != nil {
+			return err
+		}
 	}
 
 	return c.JSON(http.StatusOK, token)
@@ -222,6 +232,7 @@ func (api *UserApi) ResetPasswordWithToken(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// Cambiamos la contraseña si es el primer inicio de sesion
 func (api *UserApi) FirstLoginResetPassword(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -233,6 +244,25 @@ func (api *UserApi) FirstLoginResetPassword(c echo.Context) error {
 	username := c.QueryParam("username")
 
 	err := api.useCase.NewPasswordFirstLogin(ctx, username, newPass)
+	if err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+// Api para guardar el FCMToken
+func (api *UserApi) SaveFCMToken(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	//Obtenemos la nueva contraseña
+	username := c.QueryParam("username")
+
+	//El usuario a cambiar la contraseña
+	token := c.QueryParam("FCMToken")
+
+	err := api.useCase.SaveFCMToken(ctx, username, token)
 	if err != nil {
 		return err
 	}

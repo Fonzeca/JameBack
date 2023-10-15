@@ -1,19 +1,17 @@
 # syntax=docker/dockerfile:1
 
-FROM debian:latest
+FROM golang:alpine
 
 WORKDIR /user_hub
 
-COPY ./ ./
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
 
-# RUN apt-get update && apt-get install -y ca-certificates
+COPY . .
 
-# ADD server.crt /container/cert/path
-
-# RUN update-ca-certificates
+RUN go build -o /user_hub/user_hub .
 
 EXPOSE 5623
 
-# EXPOSE 465
-
-CMD [ "./executable", "server" ]
+ENTRYPOINT [ "./user_hub", "server" ]

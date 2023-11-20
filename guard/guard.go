@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/Fonzeca/UserHub/server/utils"
+	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/tomogoma/go-api-guard"
 )

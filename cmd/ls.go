@@ -1,13 +1,12 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
 	"fmt"
 
-	"github.com/Fonzeca/UserHub/server"
+	"github.com/Carmind-Mindia/user-hub/server"
 	"github.com/spf13/cobra"
 )
 

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Fonzeca/UserHub/server/domain"
-	"github.com/Fonzeca/UserHub/server/roles/usecase"
+	"github.com/Carmind-Mindia/user-hub/server/domain"
+	"github.com/Carmind-Mindia/user-hub/server/roles/usecase"
 	"github.com/labstack/echo/v4"
 )
 
@@ -14,12 +14,12 @@ type RolesApi struct {
 	useCase usecase.RolesUseCase
 }
 
-//Constructor
+// Constructor
 func NewuserApi(useCase usecase.RolesUseCase) *RolesApi {
 	return &RolesApi{useCase: useCase}
 }
 
-//Router
+// Router
 func (api *RolesApi) Router(e *echo.Echo) {
 	e.POST("/admin/role", api.InsertRole)
 	e.DELETE("/admin/role", api.DeleteRole)

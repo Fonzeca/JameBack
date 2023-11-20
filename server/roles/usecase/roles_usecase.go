@@ -3,8 +3,8 @@ package usecase
 import (
 	"context"
 
-	"github.com/Fonzeca/UserHub/server/domain"
-	"github.com/Fonzeca/UserHub/server/utils"
+	"github.com/Carmind-Mindia/user-hub/server/domain"
+	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/thoas/go-funk"
 )
 
@@ -38,7 +38,7 @@ func (uc *RolesUseCase) GetAllRoles(ctx context.Context) (res []domain.Role, err
 	return uc.repo.GetAll(ctx)
 }
 
-//TODO: comentar esta funcion
+// TODO: comentar esta funcion
 func (uc *RolesUseCase) ValidateRoles(ctx context.Context, roles ...string) error {
 
 	data, err := uc.repo.GetAll(ctx)

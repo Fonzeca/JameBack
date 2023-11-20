@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Fonzeca/UserHub/server/domain"
-	"github.com/Fonzeca/UserHub/server/user/repository/mongodb"
+	"github.com/Carmind-Mindia/user-hub/server/domain"
+	"github.com/Carmind-Mindia/user-hub/server/user/repository/mongodb"
 	"github.com/qiniu/qmgo"
 	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/bson/primitive"

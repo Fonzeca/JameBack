@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Fonzeca/UserHub/server/domain"
-	our_jwt "github.com/Fonzeca/UserHub/server/security/jwt"
-	"github.com/Fonzeca/UserHub/server/user/delivery/modelview"
-	"github.com/Fonzeca/UserHub/server/user/usecase"
-	"github.com/Fonzeca/UserHub/server/utils"
+	"github.com/Carmind-Mindia/user-hub/server/domain"
+	our_jwt "github.com/Carmind-Mindia/user-hub/server/security/jwt"
+	"github.com/Carmind-Mindia/user-hub/server/user/delivery/modelview"
+	"github.com/Carmind-Mindia/user-hub/server/user/usecase"
+	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/labstack/echo/v4"
 )
 

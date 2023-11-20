@@ -3,7 +3,7 @@ package domain
 import (
 	"context"
 
-	"github.com/Fonzeca/UserHub/server/utils"
+	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/qiniu/qmgo/field"
 )
 

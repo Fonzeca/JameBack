@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Fonzeca/UserHub/server/domain"
-	"github.com/Fonzeca/UserHub/server/utils"
+	"github.com/Carmind-Mindia/user-hub/server/domain"
+	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/qiniu/qmgo"
 	"github.com/qiniu/qmgo/options"
 	"go.mongodb.org/mongo-driver/bson"

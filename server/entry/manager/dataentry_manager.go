@@ -5,9 +5,9 @@ import (
 	jsonEncoder "encoding/json"
 	"log"
 
-	"github.com/Fonzeca/UserHub/server/domain"
-	data_json "github.com/Fonzeca/UserHub/server/entry/json"
-	"github.com/Fonzeca/UserHub/server/services"
+	"github.com/Carmind-Mindia/user-hub/server/domain"
+	data_json "github.com/Carmind-Mindia/user-hub/server/entry/json"
+	"github.com/Carmind-Mindia/user-hub/server/services"
 	"github.com/rabbitmq/amqp091-go"
 )
 

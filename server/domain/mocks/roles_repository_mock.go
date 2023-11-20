@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	domain "github.com/Fonzeca/UserHub/server/domain"
+	domain "github.com/Carmind-Mindia/user-hub/server/domain"
 	mock "github.com/stretchr/testify/mock"
 )
 

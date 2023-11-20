@@ -1,4 +1,4 @@
-module github.com/Fonzeca/UserHub
+module github.com/Carmind-Mindia/user-hub
 
 go 1.16
 
@@ -8,8 +8,8 @@ require (
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/qiniu/qmgo v1.0.7
-	github.com/rabbitmq/amqp091-go v1.5.0 // indirect
-	github.com/spf13/cobra v1.4.0 // indirect
+	github.com/rabbitmq/amqp091-go v1.5.0
+	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.7.0

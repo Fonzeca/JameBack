@@ -1,0 +1,11 @@
+version: '3'
+services:
+  app:
+    image: fonzeca/user-hub:dev
+    ports:
+      - 5623:5623
+    networks:
+      - carmind
+
+networks:
+  carmind:

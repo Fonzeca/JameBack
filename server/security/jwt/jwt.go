@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Fonzeca/UserHub/server/domain"
-	"github.com/Fonzeca/UserHub/server/utils"
+	"github.com/Carmind-Mindia/user-hub/server/domain"
+	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
@@ -54,8 +54,8 @@ func GenerateToken(user *domain.User) (string, error) {
 	return t, nil
 }
 
-//Validamos la construccion del token
-//Si esta todo ok, devolvemos el "secret". Funcion necesaria para jwt
+// Validamos la construccion del token
+// Si esta todo ok, devolvemos el "secret". Funcion necesaria para jwt
 func parseToken(token *jwt.Token) (interface{}, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])

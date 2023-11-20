@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	data_json "github.com/Fonzeca/UserHub/server/entry/json"
-	"github.com/Fonzeca/UserHub/server/entry/manager"
-	"github.com/Fonzeca/UserHub/server/services"
+	data_json "github.com/Carmind-Mindia/user-hub/server/entry/json"
+	"github.com/Carmind-Mindia/user-hub/server/entry/manager"
+	"github.com/Carmind-Mindia/user-hub/server/services"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 

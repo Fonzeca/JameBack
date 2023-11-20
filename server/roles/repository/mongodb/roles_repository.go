@@ -3,7 +3,7 @@ package mongodb
 import (
 	"context"
 
-	"github.com/Fonzeca/UserHub/server/domain"
+	"github.com/Carmind-Mindia/user-hub/server/domain"
 	"github.com/qiniu/qmgo"
 	"github.com/qiniu/qmgo/options"
 	"go.mongodb.org/mongo-driver/bson"

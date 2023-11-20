@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -8,9 +7,9 @@ import (
 	"fmt"
 	"os"
 
-	guard_userhub "github.com/Fonzeca/UserHub/guard"
-	"github.com/Fonzeca/UserHub/server"
-	"github.com/Fonzeca/UserHub/server/utils"
+	guard_userhub "github.com/Carmind-Mindia/user-hub/guard"
+	"github.com/Carmind-Mindia/user-hub/server"
+	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/spf13/cobra"
 )
 

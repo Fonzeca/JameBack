@@ -6,6 +6,3 @@ services:
       - 5623:5623
     networks:
       - carmind
-
-networks:
-  carmind:

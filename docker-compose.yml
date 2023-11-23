@@ -1,8 +1,18 @@
 version: '3'
 services:
-  app:
-    image: fonzeca/user-hub:dev
-    ports:
-      - 5623:5623
-    networks:
-      - carmind
+    user-hub:
+      image: fonzeca/user-hub:dev
+      ports:
+        - 5623:5623
+      networks:
+        - carmind
+      extra_hosts:
+        - mongoservice:172.21.0.1
+      volumes:
+        - ./../config/user-hub/config.json:/user_hub/config.json
+
+networks:
+  carmind:
+    driver: bridge
+    name: carmind
+    external: true

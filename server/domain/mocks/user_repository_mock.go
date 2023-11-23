@@ -106,3 +106,36 @@ func (_m *UserRepository) Update(ctx context.Context, user *domain.User) error {
 
 	return r0
 }
+
+func (_m *UserRepository) GetFCMTokensByUserNames(ctx context.Context, userNames []string) ([]struct {
+	FCMToken string `bson:"FCMToken"`
+}, error) {
+
+	ret := _m.Called(ctx, userNames)
+
+	var r0 []struct {
+		FCMToken string `bson:"FCMToken"`
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, []string) []struct {
+		FCMToken string `bson:"FCMToken"`
+	}); ok {
+		r0 = rf(ctx, userNames)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]struct {
+				FCMToken string `bson:"FCMToken"`
+			})
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, []string) error); ok {
+		r1 = rf(ctx, userNames)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+

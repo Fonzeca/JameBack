@@ -2,7 +2,7 @@
 
 FROM golang:alpine
 
-WORKDIR /user_hub
+WORKDIR /user-hub
 
 COPY go.mod ./
 COPY go.sum ./
@@ -10,8 +10,8 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /user_hub/user_hub .
+RUN go build -o /user-hub/user-hub .
 
 EXPOSE 5623
 
-ENTRYPOINT [ "./user_hub", "server" ]
+ENTRYPOINT [ "./user-hub", "server" ]

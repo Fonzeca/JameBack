@@ -15,6 +15,8 @@ type MongoRolesRepository struct {
 }
 
 func NewMongoRolesRepository(db *qmgo.Database) domain.RolesRepository {
+	_ = db.CreateCollection(context.Background(), "roles")
+
 	collection := db.Collection("roles")
 
 	//Creamos el indice para que el userName no sea duplicado

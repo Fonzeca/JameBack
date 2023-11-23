@@ -18,6 +18,8 @@ type MongoUserRepository struct {
 }
 
 func NewMongoUserRepository(db *qmgo.Database) domain.UserRepository {
+	_ = db.CreateCollection(context.Background(), "users")
+
 	collection := db.Collection("users")
 
 	//Creamos el indice para que el userName no sea duplicado

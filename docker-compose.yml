@@ -9,7 +9,7 @@ services:
       extra_hosts:
         - mongoservice:172.21.0.1
       volumes:
-        - ./../config/user-hub/config.json:/user_hub/config.json
+        - ./../config/user-hub/config.json:/user-hub/config.json
 
 networks:
   carmind:

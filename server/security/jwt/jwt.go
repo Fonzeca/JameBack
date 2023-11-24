@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type jwtCustomClaims struct {
+type JwtCustomClaims struct {
 	UserName string   `json:"userName"`
 	Admin    bool     `json:"admin"`
 	Roles    []string `json:"roles"`
@@ -32,7 +32,7 @@ func GenerateToken(user *domain.User) (string, error) {
 	exiprationMinutes := viper.GetDuration("jwt.expiration")
 
 	//Armamos los claims
-	claims := &jwtCustomClaims{
+	claims := &JwtCustomClaims{
 		UserName: user.UserName,
 		Admin:    isAdmin,
 		Roles:    user.Roles,
@@ -66,16 +66,23 @@ func parseToken(token *jwt.Token) (interface{}, error) {
 	return []byte(secret), nil
 }
 
-func ValidateAuth(c echo.Context) (jwt.MapClaims, error) {
+func ValidateAuth(c echo.Context) (*JwtCustomClaims, error) {
 	authorization := c.Request().Header.Get("Authorization")
 
 	re := regexp.MustCompile("Bearer (.+)")
 
-	if !re.MatchString(authorization) {
-		return nil, utils.ErrNoBearerToken
+	var recivedToken string
+
+	if re.MatchString(authorization) {
+		recivedToken = re.FindStringSubmatch(authorization)[1]
+
+	} else {
+		recivedToken = strings.Split(c.Request().Header.Get("Cookie"), "=")[1]
 	}
 
-	recivedToken := re.FindStringSubmatch(authorization)[1]
+	if len(recivedToken) == 0 {
+		return nil, utils.ErrNoBearerToken
+	}
 
 	token, err := jwt.Parse(recivedToken, parseToken)
 	if err != nil {
@@ -86,7 +93,7 @@ func ValidateAuth(c echo.Context) (jwt.MapClaims, error) {
 		return nil, utils.ErrExpiredToken
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
+	claims, ok := token.Claims.(*JwtCustomClaims)
 
 	if ok {
 		c.Set("claims", claims)
@@ -94,6 +101,7 @@ func ValidateAuth(c echo.Context) (jwt.MapClaims, error) {
 		return nil, utils.ErrExpiredToken
 	}
 	return claims, nil
+
 }
 
 // Middeware para chequear que el usuario este logueado

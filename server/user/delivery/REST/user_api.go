@@ -21,6 +21,7 @@ type json map[string]interface{}
 
 // Constructor
 func NewuserApi(useCase usecase.UserUseCase) *UserApi {
+
 	return &UserApi{useCase: useCase}
 }
 
@@ -58,7 +59,7 @@ func (api *UserApi) Login(c echo.Context) error {
 	password := user.Password
 	FCMToken := user.FCMToken
 
-	token, err := api.useCase.Login(ctx, userName, password, c)
+	response, err := api.useCase.Login(ctx, userName, password, c)
 
 	if err != nil {
 		return err
@@ -72,7 +73,7 @@ func (api *UserApi) Login(c echo.Context) error {
 		}
 	}
 
-	return c.JSON(http.StatusOK, token)
+	return c.JSON(http.StatusOK, response)
 }
 
 // Insertar un usuario

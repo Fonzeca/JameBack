@@ -13,7 +13,24 @@ type RolesUseCase struct {
 }
 
 func NewRolesUseCase(repo domain.RolesRepository) RolesUseCase {
-	return RolesUseCase{repo: repo}
+	uc := RolesUseCase{repo: repo}
+
+	res, err := uc.GetAllRoles(context.Background())
+	if err == nil && len(res) == 0 {
+
+		for _, r := range res {
+			if r.Name == "admin" {
+				return uc
+			}
+		}
+
+		rol := domain.Role{
+			Name: "admin",
+		}
+		uc.InsertRole(context.Background(), rol)
+	}
+
+	return uc
 }
 
 func (uc *RolesUseCase) InsertRole(ctx context.Context, rol domain.Role) error {

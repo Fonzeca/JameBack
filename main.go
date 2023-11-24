@@ -2,10 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
-	"github.com/Carmind-Mindia/user-hub/cmd"
-	guard_userhub "github.com/Carmind-Mindia/user-hub/guard"
 	_RESTrole "github.com/Carmind-Mindia/user-hub/server/roles/delivery/REST"
 	_mongoroles "github.com/Carmind-Mindia/user-hub/server/roles/repository/mongodb"
 	_usecaseroles "github.com/Carmind-Mindia/user-hub/server/roles/usecase"
@@ -20,22 +19,58 @@ import (
 	"github.com/spf13/viper"
 )
 
+var Db *qmgo.Database
+
+func init() {
+	utils.InitConfig()
+
+	db, err := initDataBase()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	Db = db
+}
+
 func main() {
+	// _, closeFunc := services.SetupRabbitMq()
+	// defer closeFunc()
 
-	cmd.Execute()
+	fastEmailConfig := sdk.Config{
+		Url: viper.GetString("fast-email.url"),
+	}
 
-	// // Generate API key
-	// APIKey, _ := g.NewAPIKey("CaasdasdrMind")
+	client := sdk.NewEmailClient(fastEmailConfig)
 
-	// fmt.Println(base64.StdEncoding.EncodeToString(APIKey.Value()))
+	reporoles := _mongoroles.NewMongoRolesRepository(Db)
+	repousers := _mongouser.NewMongoUserRepository(Db)
 
-	// s, _ := base64.StdEncoding.DecodeString("UTJGeVRXbHVaQT09LqbzeAB5RhcqQ7tdKbPpuT0k3NIRKUnWoi1FfXhV38dWJMVGTQI7v/GtpNHrASJZ4J2Z1jId3trA")
+	// entry.DataEntryManager = manager.NewDataEntryManager(repousers)
+	// entry.NewRabbitMqDataEntry()
 
-	// // Validate API Key
-	// userID, _ := g.APIKeyValid(s)
+	repoUseCase := _usecaseroles.NewRolesUseCase(reporoles)
+	userUseCase := _usecaseuser.NewUserUseCase(repousers, repoUseCase, &client)
 
-	// fmt.Println(userID)
+	rolesApi := _RESTrole.NewuserApi(repoUseCase)
+	userApi := _RESTuser.NewuserApi(userUseCase)
 
+	e := echo.New()
+
+	// Root level middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+	}))
+	// e.Use(jwt.CheckLogged)
+	e.HTTPErrorHandler = customHTTPErrorHandler
+
+	userApi.Router(e)
+	rolesApi.Router(e)
+
+	port := viper.GetString("server.port")
+
+	e.Logger.Fatal(e.Start(":" + port))
 }
 
 func customHTTPErrorHandler(err error, c echo.Context) {
@@ -86,50 +121,4 @@ func initDataBase() (*qmgo.Database, error) {
 	}
 
 	return cli.Database, nil
-
-}
-
-func initServer() {
-	utils.InitConfig()
-
-	fastEmailConfig := sdk.Config{
-		Url: viper.GetString("fast-email.url"),
-	}
-
-	client := sdk.NewEmailClient(fastEmailConfig)
-
-	db, _ := initDataBase()
-
-	keystore := guard_userhub.NewKeyStore(db) //implements KeyStore interface
-	keyGen := guard_userhub.KeyGeneratorUserHub{}
-
-	reporoles := _mongoroles.NewMongoRolesRepository(db)
-	repousers := _mongouser.NewMongoUserRepository(db)
-
-	repoUseCase := _usecaseroles.NewRolesUseCase(reporoles)
-	userUseCase := _usecaseuser.NewUserUseCase(repousers, repoUseCase, &client)
-
-	rolesApi := _RESTrole.NewuserApi(repoUseCase)
-	userApi := _RESTuser.NewuserApi(userUseCase)
-
-	guard := guard_userhub.NewGuard(&keyGen, keystore)
-
-	e := echo.New()
-
-	// Root level middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-	}))
-	// e.Use(jwt.CheckLogged)
-	e.Use(guard.EchoMiddlewareApiKey)
-	e.HTTPErrorHandler = customHTTPErrorHandler
-
-	userApi.Router(e)
-	rolesApi.Router(e)
-
-	port := viper.GetString("server.port")
-
-	e.Logger.Fatal(e.Start(":" + port))
 }

@@ -6,7 +6,6 @@ type ResetPassword struct {
 	Email       string
 }
 
-type Token struct {
-	Token              string `json:"token"`
-	MustChangePassword bool   `json:"mustChangePassword"`
+type LoginResponse struct {
+	MustChangePassword bool `json:"mustChangePassword"`
 }

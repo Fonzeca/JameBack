@@ -14,4 +14,4 @@ RUN go build -o /user-hub/user-hub .
 
 EXPOSE 5623
 
-ENTRYPOINT [ "./user-hub", "server" ]
+ENTRYPOINT [ "./user-hub" ]

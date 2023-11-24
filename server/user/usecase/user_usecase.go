@@ -13,7 +13,6 @@ import (
 	"github.com/Carmind-Mindia/user-hub/server/user/delivery/modelview"
 	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/Fonzeca/FastEmail/src/sdk"
-	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
@@ -27,6 +26,24 @@ type UserUseCase struct {
 
 func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase, emailClient *sdk.FastEmailClient) UserUseCase {
 	uc := UserUseCase{repo: repo, rolecase: roleUsecase, fastEmailClient: emailClient}
+
+	_, err := uc.GetByUserName(context.Background(), "afonzo@mindia.com")
+	if err != nil {
+		//Si no existe el usuario, lo creamos
+		usr := domain.User{
+			FirstName:         "Alexis",
+			LastName:          "Fonzo",
+			UserName:          "afonzo@mindia.com",
+			Password:          "123456",
+			DocumentType:      1,
+			DocumentNumber:    "12345678",
+			HadPasswordChange: false,
+			Roles:             []string{"admin"},
+		}
+
+		uc.Insert(context.Background(), &usr)
+	}
+
 	return uc
 }
 
@@ -113,7 +130,7 @@ func (ux *UserUseCase) Delete(ctx context.Context, UserName string) error {
 }
 
 // Metodo de login
-func (ux *UserUseCase) Login(ctx context.Context, userName string, password string, echoCtx echo.Context) (*modelview.Token, error) {
+func (ux *UserUseCase) Login(ctx context.Context, userName string, password string, echoCtx echo.Context) (*modelview.LoginResponse, error) {
 	//Buscamos un usuario con el mismo userName
 	user, err := ux.repo.GetByUserName(ctx, userName)
 
@@ -135,8 +152,7 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 
 	changePassword := !user.HadPasswordChange
 
-	tokOb := &modelview.Token{
-		Token:              token,
+	response := &modelview.LoginResponse{
 		MustChangePassword: changePassword,
 	}
 
@@ -156,19 +172,19 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 	}
 
 	if isDev {
-		cookie.Domain = "dev.carmind-app.com"
+		cookie.Domain = "dev.carmind.com.ar"
 	}
 
 	if echoCtx != nil {
 		echoCtx.SetCookie(cookie)
 	}
 
-	return tokOb, nil
+	return response, nil
 }
 
-func (ux *UserUseCase) GetUserByToken(ctx context.Context, claims jwt.MapClaims) (domain.User, error) {
+func (ux *UserUseCase) GetUserByToken(ctx context.Context, claims *myjwt.JwtCustomClaims) (domain.User, error) {
 	//Obtenemos el userName desde el mismo contexto de echo
-	userName := claims["userName"].(string)
+	userName := claims.UserName
 
 	//Buscamos un usuario con el mismo userName
 	user, err := ux.repo.GetByUserName(ctx, userName)

@@ -2,6 +2,7 @@ package REST
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -169,6 +170,8 @@ func (api *UserApi) ValidateToken(c echo.Context) error {
 func (api *UserApi) GetUserLogged(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
+
+	fmt.Println("GetUserLogged")
 
 	//Obtenemos los claims del token del header
 	claims, err := our_jwt.ValidateAuth(c)

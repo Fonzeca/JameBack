@@ -2,8 +2,8 @@ version: '3'
 services:
     user-hub:
       image: fonzeca/user-hub:dev
-      ports:
-        - 5623:5623
+      # ports:
+      #   - 5623:5623
       networks:
         - carmind
       extra_hosts:

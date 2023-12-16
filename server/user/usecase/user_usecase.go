@@ -27,13 +27,13 @@ type UserUseCase struct {
 func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase, emailClient *sdk.FastEmailClient) UserUseCase {
 	uc := UserUseCase{repo: repo, rolecase: roleUsecase, fastEmailClient: emailClient}
 
-	_, err := uc.GetByUserName(context.Background(), "afonzo@mindia.com")
+	_, err := uc.GetByUserName(context.Background(), "afonzo@mindia.com.ar")
 	if err != nil {
 		//Si no existe el usuario, lo creamos
 		usr := domain.User{
 			FirstName:         "Alexis",
 			LastName:          "Fonzo",
-			UserName:          "afonzo@mindia.com",
+			UserName:          "afonzo@mindia.com.ar",
 			Password:          "123456",
 			DocumentType:      1,
 			DocumentNumber:    "12345678",

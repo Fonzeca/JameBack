@@ -41,4 +41,9 @@ jobs:
             cd ${{ env.PATH_TO_COMPOSE}}
             docker compose pull
             docker compose up -d
+
+      - name: Trigger Vybit
+        run: curl https://vybit.net/trigger/jojkplvbig9af2uh
+
+      
     

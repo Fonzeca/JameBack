@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-type JwtCustomClaims struct {
-	UserName string   `json:"userName"`
+type AuthClaims struct {
+	Username string   `json:"username"`
 	Admin    bool     `json:"admin"`
 	Roles    []string `json:"roles"`
 	jwt.StandardClaims
@@ -32,8 +32,8 @@ func GenerateToken(user *domain.User) (string, error) {
 	exiprationMinutes := viper.GetDuration("jwt.expiration")
 
 	//Armamos los claims
-	claims := &JwtCustomClaims{
-		UserName: user.UserName,
+	claims := &AuthClaims{
+		Username: user.UserName,
 		Admin:    isAdmin,
 		Roles:    user.Roles,
 		StandardClaims: jwt.StandardClaims{
@@ -66,7 +66,7 @@ func parseToken(token *jwt.Token) (interface{}, error) {
 	return []byte(secret), nil
 }
 
-func ValidateAuth(c echo.Context) (*JwtCustomClaims, error) {
+func ValidateAuth(c echo.Context) (*AuthClaims, error) {
 	authorization := c.Request().Header.Get("Authorization")
 
 	re := regexp.MustCompile("Bearer (.+)")
@@ -84,7 +84,7 @@ func ValidateAuth(c echo.Context) (*JwtCustomClaims, error) {
 		return nil, utils.ErrNoBearerToken
 	}
 
-	token, err := jwt.Parse(recivedToken, parseToken)
+	token, err := jwt.ParseWithClaims(recivedToken, &AuthClaims{}, parseToken)
 	if err != nil {
 		return nil, utils.ErrExpiredToken
 	}
@@ -93,7 +93,7 @@ func ValidateAuth(c echo.Context) (*JwtCustomClaims, error) {
 		return nil, utils.ErrExpiredToken
 	}
 
-	claims, ok := token.Claims.(*JwtCustomClaims)
+	claims, ok := token.Claims.(*AuthClaims)
 
 	if ok {
 		c.Set("claims", claims)

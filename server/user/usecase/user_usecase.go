@@ -182,9 +182,9 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 	return response, nil
 }
 
-func (ux *UserUseCase) GetUserByToken(ctx context.Context, claims *myjwt.JwtCustomClaims) (domain.User, error) {
+func (ux *UserUseCase) GetUserByToken(ctx context.Context, claims *myjwt.AuthClaims) (domain.User, error) {
 	//Obtenemos el userName desde el mismo contexto de echo
-	userName := claims.UserName
+	userName := claims.Username
 
 	//Buscamos un usuario con el mismo userName
 	user, err := ux.repo.GetByUserName(ctx, userName)

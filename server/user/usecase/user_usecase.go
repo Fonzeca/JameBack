@@ -172,7 +172,12 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 	}
 
 	if isDev {
-		cookie.Domain = "dev.carmind.com.ar"
+		if echoCtx != nil && echoCtx.Request().Header.Get("Origin") == "https://localhost:3000" {
+			cookie.Domain = "localhost"
+			cookie.SameSite = http.SameSiteNoneMode
+		} else {
+			cookie.Domain = "dev.carmind.com.ar"
+		}
 	}
 
 	if echoCtx != nil {

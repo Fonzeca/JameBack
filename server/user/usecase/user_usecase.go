@@ -174,7 +174,7 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 	if isDev {
 
 		cookie.Domain = "dev.carmind.com.ar"
-		cookie.SameSite = http.SameSiteLaxMode
+		cookie.SameSite = http.SameSiteNoneMode
 
 	}
 

@@ -159,11 +159,11 @@ func (api *UserApi) DeleteOne(c echo.Context) error {
 // Valida el token
 func (api *UserApi) ValidateToken(c echo.Context) error {
 	//Obtenemos los claims del token del header
-	_, err := our_jwt.ValidateAuth(c)
+	claims, err := our_jwt.ValidateAuth(c)
 	if err != nil {
 		return err
 	}
-	return c.NoContent(http.StatusOK)
+	return c.JSON(http.StatusOK, claims)
 }
 
 // Obtiene un usuario logueado

@@ -7,5 +7,10 @@ type ResetPassword struct {
 }
 
 type LoginResponse struct {
-	MustChangePassword bool `json:"mustChangePassword"`
+	MustChangePassword bool     `json:"mustChangePassword"`
+	Username           string   `json:"username"`
+	Admin              bool     `json:"admin"`
+	Roles              []string `json:"roles"`
+	FullName           string   `json:"fullName"`
+	Expiration         int64    `json:"expiration"`
 }

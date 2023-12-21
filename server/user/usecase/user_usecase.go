@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 	"math/rand"
-	"net/http"
 	"strconv"
 	"time"
 
@@ -144,42 +143,24 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 		return nil, utils.ErrTryLogin
 	}
 
-	// Generamos el token
-	token, err := myjwt.GenerateToken(&user)
-	if err != nil {
-		return nil, err
-	}
-
 	changePassword := !user.HadPasswordChange
 
-	response := &modelview.LoginResponse{
-		MustChangePassword: changePassword,
+	isAdmin := false
+	for _, v := range user.Roles {
+		if v == "admin" {
+			isAdmin = true
+		}
 	}
 
 	exiprationMinutes := viper.GetDuration("jwt.expiration")
 
-	isDev := viper.GetString("enviroment") == "dev"
-
-	//Seteamos la cookie
-	cookie := &http.Cookie{
-		Name:     "session",
-		Value:    token,
-		Path:     "/",
-		Expires:  time.Now().Add(time.Minute * exiprationMinutes),
-		Secure:   true,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	}
-
-	if isDev {
-
-		cookie.Domain = "dev.carmind.com.ar"
-		cookie.SameSite = http.SameSiteNoneMode
-
-	}
-
-	if echoCtx != nil {
-		echoCtx.SetCookie(cookie)
+	response := &modelview.LoginResponse{
+		MustChangePassword: changePassword,
+		Username:           user.UserName,
+		Admin:              isAdmin,
+		Roles:              user.Roles,
+		FullName:           user.FirstName + " " + user.LastName,
+		Expiration:         time.Now().Add(time.Minute * exiprationMinutes).Unix(),
 	}
 
 	return response, nil

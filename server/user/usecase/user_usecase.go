@@ -8,7 +8,6 @@ import (
 
 	"github.com/Carmind-Mindia/user-hub/server/domain"
 	"github.com/Carmind-Mindia/user-hub/server/roles/usecase"
-	myjwt "github.com/Carmind-Mindia/user-hub/server/security/jwt"
 	"github.com/Carmind-Mindia/user-hub/server/user/delivery/modelview"
 	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/Fonzeca/FastEmail/src/sdk"
@@ -164,20 +163,6 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 	}
 
 	return response, nil
-}
-
-func (ux *UserUseCase) GetUserByToken(ctx context.Context, claims *myjwt.AuthClaims) (domain.User, error) {
-	//Obtenemos el userName desde el mismo contexto de echo
-	userName := claims.Username
-
-	//Buscamos un usuario con el mismo userName
-	user, err := ux.repo.GetByUserName(ctx, userName)
-	user.Password = ""
-	if err != nil {
-		return user, err
-	}
-
-	return user, nil
 }
 
 func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username string, name string) error {

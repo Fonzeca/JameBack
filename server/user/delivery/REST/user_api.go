@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Carmind-Mindia/user-hub/server/domain"
-	our_jwt "github.com/Carmind-Mindia/user-hub/server/security/jwt"
+	"github.com/Carmind-Mindia/user-hub/server/security"
 	"github.com/Carmind-Mindia/user-hub/server/user/delivery/modelview"
 	"github.com/Carmind-Mindia/user-hub/server/user/usecase"
 	"github.com/Carmind-Mindia/user-hub/server/utils"
@@ -29,20 +29,20 @@ func NewuserApi(useCase usecase.UserUseCase) *UserApi {
 // Router
 func (api *UserApi) Router(e *echo.Echo) {
 
-	e.POST("/admin/user", api.InsertOne)
-	e.PUT("/admin/user", api.UpdateOne)
-	e.DELETE("/admin/user", api.DeleteOne)
-	e.GET("/admin/user", api.GetUserByUserName)
-	e.GET("/admin/users", api.GetAllusers)
-	e.POST("/admin/saveFCMToken", api.SaveFCMToken)
+	e.POST("/admin/user", api.InsertOne, security.ParseHeadersMiddleware)
+	e.PUT("/admin/user", api.UpdateOne, security.ParseHeadersMiddleware)
+	e.DELETE("/admin/user", api.DeleteOne, security.ParseHeadersMiddleware)
+	e.GET("/admin/user", api.GetUserByUserName, security.ParseHeadersMiddleware)
+	e.GET("/admin/users", api.GetAllusers, security.ParseHeadersMiddleware)
+	e.POST("/admin/saveFCMToken", api.SaveFCMToken, security.ParseHeadersMiddleware)
 
 	e.POST("/public/recoverPassword", api.SendEmailToRecoverPassword)
 	e.POST("/public/validateRecoverToken", api.ValidateRecoverPasswordToken)
 	e.POST("/public/resetPassword", api.ResetPasswordWithToken)
 
-	e.GET("/logged", api.GetUserLogged)
-	e.POST("/validate", api.ValidateToken)
-	e.POST("/firstLoginResetPassword", api.FirstLoginResetPassword)
+	e.GET("/logged", api.GetUserLogged, security.ParseHeadersMiddleware)
+	e.POST("/validate", api.ValidateToken, security.ParseHeadersMiddleware)
+	e.POST("/firstLoginResetPassword", api.FirstLoginResetPassword, security.ParseHeadersMiddleware)
 	e.POST("/login", api.Login)
 }
 
@@ -159,13 +159,26 @@ func (api *UserApi) DeleteOne(c echo.Context) error {
 }
 
 // Valida el token
+// Obtiene los datos del contexto de echo y los convierte en un objeto User
 func (api *UserApi) ValidateToken(c echo.Context) error {
-	//Obtenemos los claims del token del header
-	claims, err := our_jwt.ValidateAuth(c)
-	if err != nil {
-		return err
+
+	// Obtener los datos del contexto de echo
+	username := c.Get("username").(string)
+	isAdmin := c.Get("admin").(bool)
+	roles := c.Get("roles").([]string)
+
+	// Crear objeto anónimo para retornar un JSON
+	response := struct {
+		Username string   `json:"username"`
+		IsAdmin  bool     `json:"isAdmin"`
+		Roles    []string `json:"roles"`
+	}{
+		Username: username,
+		IsAdmin:  isAdmin,
+		Roles:    roles,
 	}
-	return c.JSON(http.StatusOK, claims)
+
+	return c.JSON(http.StatusOK, response)
 }
 
 // Obtiene un usuario logueado
@@ -173,15 +186,10 @@ func (api *UserApi) GetUserLogged(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	fmt.Println("GetUserLogged")
+	// Obtener los datos del contexto de echo
+	username := c.Get("username").(string)
 
-	//Obtenemos los claims del token del header
-	claims, err := our_jwt.ValidateAuth(c)
-	if err != nil {
-		return err
-	}
-
-	user, err := api.useCase.GetUserByToken(ctx, claims)
+	user, err := api.useCase.GetByUserName(ctx, username)
 
 	if err != nil {
 		return err

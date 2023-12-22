@@ -56,6 +56,8 @@ func (api *UserApi) Login(c echo.Context) error {
 	user := domain.User{}
 	c.Bind(&user)
 
+	fmt.Println(user)
+
 	userName := user.UserName
 	password := user.Password
 	FCMToken := user.FCMToken

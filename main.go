@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 
 	_RESTrole "github.com/Carmind-Mindia/user-hub/server/roles/delivery/REST"
@@ -60,24 +58,6 @@ func main() {
 
 	// Root level middleware
 	e.Use(middleware.Logger())
-	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			if c.Request().Header.Get("Content-Type") != echo.MIMEApplicationJSON {
-				return next(c)
-			}
-
-			data, err := io.ReadAll(c.Request().Body)
-			if err != nil {
-				return err
-			}
-
-			c.Logger().Error(string(data))
-			c.Request().Body = io.NopCloser(bytes.NewReader(data))
-
-			return next(c)
-		}
-	})
-
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},

@@ -28,7 +28,7 @@ func ParseHeadersMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		// Pasar los headers al contexto de Echo
 		roles := strings.Split(headers.Get("X-Roles"), ",")
 		c.Set("username", headers.Get("X-Username"))
-		c.Set("admin", headers.Get("X-Admin"))
+		c.Set("admin", headers.Get("X-Admin") == "true")
 		c.Set("roles", roles)
 
 		// Llamar al siguiente handler

@@ -12,7 +12,6 @@ import (
 	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/Fonzeca/FastEmail/src/sdk"
 	"github.com/labstack/echo/v4"
-	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -151,15 +150,12 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 		}
 	}
 
-	exiprationMinutes := viper.GetDuration("jwt.expiration")
-
 	response := &modelview.LoginResponse{
 		MustChangePassword: changePassword,
 		Username:           user.UserName,
 		Admin:              isAdmin,
 		Roles:              user.Roles,
 		FullName:           user.FirstName + " " + user.LastName,
-		Expiration:         time.Now().Add(time.Minute * exiprationMinutes).Unix(),
 	}
 
 	return response, nil

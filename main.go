@@ -62,7 +62,6 @@ func main() {
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 	}))
-	// e.Use(jwt.CheckLogged)
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	userApi.Router(e)

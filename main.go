@@ -59,9 +59,7 @@ func main() {
 	// Root level middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-	}))
+
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	userApi.Router(e)

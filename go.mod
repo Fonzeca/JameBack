@@ -10,7 +10,7 @@ require (
 	github.com/rabbitmq/amqp091-go v1.5.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/spf13/viper v1.13.0
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.4
 	github.com/thoas/go-funk v0.9.1
 	go.mongodb.org/mongo-driver v1.8.4
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4

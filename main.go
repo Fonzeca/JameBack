@@ -37,7 +37,7 @@ func main() {
 	// defer closeFunc()
 
 	fastEmailConfig := sdk.Config{
-		Url: viper.GetString("fast-email.url"),
+		Url: viper.GetString("fastemail.url"),
 	}
 
 	client := sdk.NewEmailClient(fastEmailConfig)

@@ -253,9 +253,12 @@ func (api *UserApi) FirstLoginResetPassword(c echo.Context) error {
 
 	//Obtenemos la nueva contraseña
 	newPass := c.QueryParam("newPassword")
+	username := c.Get("username").(string)
 
-	//El usuario a cambiar la contraseña
-	username := c.QueryParam("username")
+	// Validate newPass and username
+	if newPass == "" || username == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Bad request")
+	}
 
 	err := api.useCase.NewPasswordFirstLogin(ctx, username, newPass)
 	if err != nil {

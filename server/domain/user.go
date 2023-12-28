@@ -18,7 +18,7 @@ type User struct {
 	DocumentType         int      `bson:"documentType"` //1: DNI
 	DocumentNumber       string   `bson:"documentNumber"`
 	RecoverPasswordToken string   `bson:"recoverPasswordToken"`
-	HadPasswordChange    bool     `bson:"hadPasswordChange"`
+	MustChangePassword   bool     `bson:"mustChangePassword"`
 	FCMToken             string   `bson:"FCMToken"`
 	FCMCreateTimeStamp   string   `bson:"FCMCreateTimeStamp"`
 }

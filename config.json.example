@@ -14,10 +14,8 @@
     "server": {
         "port": "5623"
     },
-    "email": {
-        "host" : "url",
-        "port" : 1122,
-        "username" : "info@lanacion.com",
-        "password" : "somepassword"
-    }
+    "fastemail" : {
+        "url" : "asdfas"
+    },
+    "mustChangeFirstTimePassword" : true
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/Carmind-Mindia/user-hub/server/user/delivery/modelview"
 	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/labstack/echo/v4"
+	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -28,14 +29,14 @@ func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase
 	if err != nil {
 		//Si no existe el usuario, lo creamos
 		usr := domain.User{
-			FirstName:         "Alexis",
-			LastName:          "Fonzo",
-			UserName:          "afonzo@mindia.com.ar",
-			Password:          "123456",
-			DocumentType:      1,
-			DocumentNumber:    "12345678",
-			HadPasswordChange: false,
-			Roles:             []string{"admin"},
+			FirstName:          "Alexis",
+			LastName:           "Fonzo",
+			UserName:           "afonzo@mindia.com.ar",
+			Password:           "123456",
+			DocumentType:       1,
+			DocumentNumber:     "12345678",
+			MustChangePassword: viper.GetBool("mustChangeFirstTimePassword"),
+			Roles:              []string{"admin"},
 		}
 
 		uc.Insert(context.Background(), &usr)
@@ -117,6 +118,8 @@ func (uc *UserUseCase) Insert(ctx context.Context, user *domain.User) (domain.Us
 	//Seteamos la pass al user
 	user.Password = string(hashedPassword)
 
+	user.MustChangePassword = viper.GetBool("mustChangeFirstTimePassword")
+
 	//Insertamos el user
 	return uc.repo.Insert(ctx, user)
 }
@@ -141,7 +144,7 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 		return nil, utils.ErrTryLogin
 	}
 
-	changePassword := !user.HadPasswordChange
+	changePassword := user.MustChangePassword
 
 	isAdmin := false
 	for _, v := range user.Roles {
@@ -234,12 +237,12 @@ func (ux *UserUseCase) NewPasswordFirstLogin(ctx context.Context, username strin
 		return utils.ErrSamePassword
 	}
 
-	if user.HadPasswordChange {
+	if !user.MustChangePassword {
 		return utils.ErrHasChangedPassword
 	}
 
 	user.Password = string(hashed)
-	user.HadPasswordChange = true
+	user.MustChangePassword = false
 
 	err = ux.repo.Update(ctx, &user)
 	if err != nil {

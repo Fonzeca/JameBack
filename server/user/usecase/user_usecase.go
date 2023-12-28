@@ -6,11 +6,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Carmind-Mindia/fastemail/src/sdk"
 	"github.com/Carmind-Mindia/user-hub/server/domain"
 	"github.com/Carmind-Mindia/user-hub/server/roles/usecase"
 	"github.com/Carmind-Mindia/user-hub/server/user/delivery/modelview"
 	"github.com/Carmind-Mindia/user-hub/server/utils"
-	"github.com/Fonzeca/FastEmail/src/sdk"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -178,7 +178,7 @@ func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username st
 
 	user.RecoverPasswordToken = string(hashedPassword)
 
-	err = ux.fastEmailClient.SendRecoverPassword(username, user.FirstName, strconv.Itoa(u4))
+	err = ux.fastEmailClient.SendRecoverPassword(username, user.FirstName)
 	if err != nil {
 		return err
 	}

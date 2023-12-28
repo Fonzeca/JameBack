@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Carmind-Mindia/fastemail/src/sdk"
 	_RESTrole "github.com/Carmind-Mindia/user-hub/server/roles/delivery/REST"
 	_mongoroles "github.com/Carmind-Mindia/user-hub/server/roles/repository/mongodb"
 	_usecaseroles "github.com/Carmind-Mindia/user-hub/server/roles/usecase"
@@ -12,7 +13,6 @@ import (
 	_mongouser "github.com/Carmind-Mindia/user-hub/server/user/repository/mongodb"
 	_usecaseuser "github.com/Carmind-Mindia/user-hub/server/user/usecase"
 	"github.com/Carmind-Mindia/user-hub/server/utils"
-	"github.com/Fonzeca/FastEmail/src/sdk"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/qiniu/qmgo"

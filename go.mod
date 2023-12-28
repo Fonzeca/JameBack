@@ -3,20 +3,15 @@ module github.com/Carmind-Mindia/user-hub
 go 1.16
 
 require (
-	github.com/Fonzeca/FastEmail/src/sdk v0.0.0-20220516144753-d99096fc0c9e
-	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/jpillora/backoff v1.0.0 // indirect
-	github.com/labstack/echo/v4 v4.7.2
+	github.com/Carmind-Mindia/fastemail v0.1.0
+	github.com/bketelsen/crypt v0.0.4 // indirect
+	github.com/labstack/echo/v4 v4.9.0
 	github.com/qiniu/qmgo v1.0.7
 	github.com/rabbitmq/amqp091-go v1.5.0
-	github.com/spf13/cobra v1.4.0
-	github.com/spf13/viper v1.8.1
-	github.com/stretchr/objx v0.1.1 // indirect
-	github.com/stretchr/testify v1.7.0
+	github.com/smartystreets/goconvey v1.6.4 // indirect
+	github.com/spf13/viper v1.13.0
+	github.com/stretchr/testify v1.8.0
 	github.com/thoas/go-funk v0.9.1
-	github.com/tomogoma/generator v0.0.0-20171014125632-4398aab4dd41 // indirect
-	github.com/tomogoma/go-api-guard v0.0.0-20180312041446-a2bad766ec64
-	github.com/tomogoma/go-typed-errors v0.0.0-20181222204503-0532faf740be // indirect
 	go.mongodb.org/mongo-driver v1.8.4
-	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
+	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 )

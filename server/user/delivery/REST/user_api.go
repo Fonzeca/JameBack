@@ -36,9 +36,9 @@ func (api *UserApi) Router(e *echo.Echo) {
 	e.GET("/admin/users", api.GetAllusers, security.ParseHeadersMiddleware)
 	e.POST("/admin/saveFCMToken", api.SaveFCMToken, security.ParseHeadersMiddleware)
 
-	e.POST("/public/recoverPassword", api.SendEmailToRecoverPassword)
-	e.POST("/public/validateRecoverToken", api.ValidateRecoverPasswordToken)
-	e.POST("/public/resetPassword", api.ResetPasswordWithToken)
+	e.POST("/pw/recover", api.SendEmailToRecoverPassword)
+	e.POST("/pw/validateToken", api.ValidateRecoverPasswordToken)
+	e.POST("/pw/reset", api.ResetPasswordWithToken)
 
 	e.GET("/logged", api.GetUserLogged, security.ParseHeadersMiddleware)
 	e.POST("/validate", api.ValidateToken, security.ParseHeadersMiddleware)

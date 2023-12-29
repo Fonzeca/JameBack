@@ -164,7 +164,7 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 	return response, nil
 }
 
-func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username string, name string) error {
+func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username string) error {
 
 	user, err := ux.GetByUserName(ctx, username)
 	if err != nil {

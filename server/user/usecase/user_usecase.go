@@ -181,7 +181,7 @@ func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username st
 
 	user.RecoverPasswordToken = string(hashedPassword)
 
-	err = ux.fastEmailClient.SendRecoverPassword(username, user.FirstName)
+	err = ux.fastEmailClient.SendRecoverPassword(username, strconv.Itoa(u4))
 	if err != nil {
 		return err
 	}

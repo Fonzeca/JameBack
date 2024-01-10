@@ -215,6 +215,11 @@ func (ux *UserUseCase) ResetPasswordWithToken(ctx context.Context, view modelvie
 	}
 
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(view.NewPassword), 8)
+
+	if user.Password == string(hashed) {
+		return utils.ErrSamePassword
+	}
+
 	user.Password = string(hashed)
 	user.RecoverPasswordToken = ""
 

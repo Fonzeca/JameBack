@@ -240,6 +240,10 @@ func (api *UserApi) ResetPasswordWithToken(c echo.Context) error {
 	modelview := modelview.ResetPassword{}
 	c.Bind(&modelview)
 
+	if modelview.NewPassword == "" || modelview.Token == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "Bad request")
+	}
+
 	err := api.useCase.ResetPasswordWithToken(ctx, modelview)
 	if err != nil {
 		return err

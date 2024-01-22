@@ -22,6 +22,7 @@ type User struct {
 	FCMToken             string   `bson:"FCMToken"`
 	FCMCreateTimeStamp   string   `bson:"FCMCreateTimeStamp"`
 	AvatarColor          string   `bson:"avatarColor"`
+	Phone                string   `bson:"phone"`
 }
 
 type DocumentType int

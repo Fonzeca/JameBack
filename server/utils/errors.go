@@ -7,7 +7,7 @@ var (
 
 	ErrInternalError = NewHTTPError(http.StatusInternalServerError, "2-GEM", "Algo paso con el servidor")
 
-	ErrTryLogin = NewHTTPError(http.StatusBadRequest, "3-UNA", "Email o contraseña incorrecta")
+	ErrTryLogin = NewHTTPError(http.StatusBadRequest, "3-UNA", "Username o contraseña incorrecta")
 
 	ErrBadRequest = NewHTTPError(http.StatusBadRequest, "4-BR", "Formato de llamada incorrecto")
 
@@ -15,7 +15,7 @@ var (
 
 	ErrExpiredToken = NewHTTPError(http.StatusUnauthorized, "6-ET", "Sesion expirada")
 
-	ErrOnInsertNoUsername = NewHTTPError(http.StatusBadRequest, "8-UNE", "Email vacio")
+	ErrOnInsertNoUsername = NewHTTPError(http.StatusBadRequest, "8-UNE", "Username vacio")
 
 	ErrOnInsertNoPassword = NewHTTPError(http.StatusBadRequest, "9-PE", "Contraseña vacia")
 

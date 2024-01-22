@@ -21,6 +21,7 @@ type User struct {
 	MustChangePassword   bool     `bson:"mustChangePassword"`
 	FCMToken             string   `bson:"FCMToken"`
 	FCMCreateTimeStamp   string   `bson:"FCMCreateTimeStamp"`
+	AvatarColor          string   `bson:"avatarColor"`
 }
 
 type DocumentType int

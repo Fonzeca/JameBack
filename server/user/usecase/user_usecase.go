@@ -79,6 +79,14 @@ func (uc *UserUseCase) Update(ctx context.Context, user *domain.User) error {
 		usrDb.DocumentNumber = user.DocumentNumber
 	}
 
+	if len(user.AvatarColor) > 0 {
+		usrDb.AvatarColor = user.AvatarColor
+	}
+
+	if len(user.Phone) > 0 {
+		usrDb.Phone = user.Phone
+	}
+
 	//Validamos que el usuario tenga bien los roles
 	if err := uc.rolecase.ValidateRoles(ctx, user.Roles...); err != nil {
 		return err

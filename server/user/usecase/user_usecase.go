@@ -47,7 +47,14 @@ func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase
 
 // Obtiene el usuario por el nombre de usuario
 func (uc *UserUseCase) GetByUserName(ctx context.Context, userName string) (domain.User, error) {
-	return uc.repo.GetByUserName(ctx, userName)
+	user, err := uc.repo.GetByUserName(ctx, userName)
+	if err != nil {
+		return user, err
+	}
+
+	user.Password = ""
+
+	return user, nil
 }
 
 // Actualiza los datos del usuario segun vengan en el request
@@ -100,7 +107,17 @@ func (uc *UserUseCase) Update(ctx context.Context, user *domain.User) error {
 // Obtiene todos los usuario
 // TODO: paginacion
 func (uc *UserUseCase) GetAll(ctx context.Context) ([]domain.User, error) {
-	return uc.repo.GetAll(ctx)
+	users, err := uc.repo.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// remove password to all users
+	for i := range users {
+		users[i].Password = ""
+	}
+
+	return users, nil
 }
 
 // Creamos un usuario
@@ -128,8 +145,14 @@ func (uc *UserUseCase) Insert(ctx context.Context, user *domain.User) (domain.Us
 
 	user.MustChangePassword = viper.GetBool("mustChangeFirstTimePassword")
 
-	//Insertamos el user
-	return uc.repo.Insert(ctx, user)
+	finalUser, err := uc.repo.Insert(ctx, user)
+	if err != nil {
+		user.Password = ""
+		return *user, err
+	}
+
+	finalUser.Password = ""
+	return finalUser, nil
 }
 
 // Borramos un user
@@ -212,6 +235,8 @@ func (ux *UserUseCase) ValidateRecoverPasswordToken(ctx context.Context, view mo
 	if err := bcrypt.CompareHashAndPassword([]byte(user.RecoverPasswordToken), []byte(view.Token)); err != nil {
 		return user, utils.ErrOnChangePassword
 	}
+
+	user.Password = ""
 
 	return user, nil
 }

@@ -101,13 +101,14 @@ func initDataBase() (*qmgo.Database, error) {
 	username := viper.GetString("db.user")
 	password := viper.GetString("db.password")
 	database := viper.GetString("db.database")
+	authSource := viper.GetString("db.authSource")
 
 	uri := "mongodb://" + url + ":" + port + "/" + database
 
 	var config qmgo.Config
 
 	if len(username) > 0 {
-		config = qmgo.Config{Uri: uri, Database: database, Coll: "user", Auth: &qmgo.Credential{AuthSource: database, Username: username, Password: password}}
+		config = qmgo.Config{Uri: uri, Database: database, Coll: "user", Auth: &qmgo.Credential{AuthSource: authSource, Username: username, Password: password}}
 	} else {
 		config = qmgo.Config{Uri: uri, Database: database, Coll: "user"}
 	}

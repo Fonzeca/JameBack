@@ -28,17 +28,19 @@ func NewuserApi(useCase usecase.UserUseCase) *UserApi {
 
 // Router
 func (api *UserApi) Router(e *echo.Echo) {
+	userGroup := e.Group("/user")
 
-	e.POST("/admin/user", api.InsertOne, security.ParseHeadersMiddleware)
-	e.PUT("/admin/user", api.UpdateOne, security.ParseHeadersMiddleware)
-	e.DELETE("/admin/user", api.DeleteOne, security.ParseHeadersMiddleware)
-	e.GET("/admin/user", api.GetUserByUserName, security.ParseHeadersMiddleware)
-	e.GET("/admin/users", api.GetAllusers, security.ParseHeadersMiddleware)
-	e.POST("/admin/saveFCMToken", api.SaveFCMToken, security.ParseHeadersMiddleware)
+	userGroup.POST("/", api.InsertOne, security.ParseHeadersMiddleware)
+	userGroup.PUT("/", api.UpdateOne, security.ParseHeadersMiddleware)
+	userGroup.DELETE("/", api.DeleteOne, security.ParseHeadersMiddleware)
+	userGroup.GET("/username/:username", api.GetUserByUserName, security.ParseHeadersMiddleware)
+	userGroup.GET("/all", api.GetAllusers, security.ParseHeadersMiddleware)
 
-	e.POST("/pw/recover", api.SendEmailToRecoverPassword)
-	e.POST("/pw/validateToken", api.ValidateRecoverPasswordToken)
-	e.POST("/pw/reset", api.ResetPasswordWithToken)
+	pwGroup := e.Group("/password")
+
+	pwGroup.POST("/recover", api.SendEmailToRecoverPassword)
+	pwGroup.POST("/validateToken", api.ValidateRecoverPasswordToken)
+	pwGroup.POST("/reset", api.ResetPasswordWithToken)
 
 	e.GET("/logged", api.GetUserLogged, security.ParseHeadersMiddleware)
 	e.POST("/validate", api.ValidateToken, security.ParseHeadersMiddleware)
@@ -60,20 +62,11 @@ func (api *UserApi) Login(c echo.Context) error {
 
 	userName := user.UserName
 	password := user.Password
-	FCMToken := user.FCMToken
 
 	response, err := api.useCase.Login(ctx, userName, password, c)
 
 	if err != nil {
 		return err
-	}
-
-	//Si nos dan el token, lo guardamos
-	if len(FCMToken) > 0 {
-		err = api.useCase.SaveFCMToken(ctx, userName, FCMToken)
-		if err != nil {
-			return err
-		}
 	}
 
 	return c.JSON(http.StatusOK, response)
@@ -100,8 +93,7 @@ func (api *UserApi) GetUserByUserName(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	values, _ := c.FormParams()
-	username := values.Get("userName")
+	username := c.Param("username")
 	if len(username) <= 0 {
 		return utils.ErrBadRequest
 	}
@@ -267,25 +259,6 @@ func (api *UserApi) FirstLoginResetPassword(c echo.Context) error {
 	}
 
 	err := api.useCase.NewPasswordFirstLogin(ctx, username, newPass)
-	if err != nil {
-		return err
-	}
-
-	return c.NoContent(http.StatusOK)
-}
-
-// Api para guardar el FCMToken
-func (api *UserApi) SaveFCMToken(c echo.Context) error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
-	defer cancel()
-
-	//Obtenemos la nueva contraseña
-	username := c.QueryParam("username")
-
-	//El usuario a cambiar la contraseña
-	token := c.QueryParam("FCMToken")
-
-	err := api.useCase.SaveFCMToken(ctx, username, token)
 	if err != nil {
 		return err
 	}

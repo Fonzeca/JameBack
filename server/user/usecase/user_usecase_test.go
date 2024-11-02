@@ -2,6 +2,7 @@ package usecase_test
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -21,11 +22,10 @@ import (
 func TestCreateUser(t *testing.T) {
 	mockUserRepo := new(mocks.UserRepository)
 	mockRoleRepo := new(mocks.RolesRepository)
+	mockRoleRepo.On("GetAll", mock.Anything).Return(nil, fmt.Errorf("error")).Once()
 	ru := _rolesUseCase.NewRolesUseCase(mockRoleRepo)
 
-	// mockUserRepo.On("GetAll", mock.Anything).Return([]domain.User{
-	// 	domain.User{},
-	// }, nil)
+	mockUserRepo.On("GetByUserName", mock.Anything, mock.Anything).Return(domain.User{}, nil).Once()
 	u := _userUseCase.NewUserUseCase(mockUserRepo, ru, nil)
 
 	var createUserTests = []struct {
@@ -37,11 +37,9 @@ func TestCreateUser(t *testing.T) {
 		{
 			nameTest: "success",
 			userToInsert: domain.User{
-				UserName:       "username",
-				Password:       "Password",
-				DocumentType:   1,
-				DocumentNumber: "38096937",
-				Roles:          []string{"admin"},
+				UserName: "username",
+				Password: "Password",
+				Roles:    []string{"admin"},
 			},
 			errorExpected: nil,
 			prepare: func(repoUser *mock.Mock, repoRole *mock.Mock) {
@@ -57,10 +55,8 @@ func TestCreateUser(t *testing.T) {
 		{
 			nameTest: "fail-by-property-password",
 			userToInsert: domain.User{
-				UserName:       "username",
-				Password:       "",
-				DocumentType:   1,
-				DocumentNumber: "38096937",
+				UserName: "username",
+				Password: "",
 			},
 			errorExpected: utils.ErrOnInsertNoPassword,
 			prepare: func(repo *mock.Mock, repoRole *mock.Mock) {
@@ -105,11 +101,9 @@ func TestLogin(t *testing.T) {
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("12345"), 8)
 	userInDb := domain.User{
-		UserName:       "pepito",
-		Password:       string(hashedPassword),
-		DocumentType:   1,
-		DocumentNumber: "38096937",
-		Roles:          []string{"admin"},
+		UserName: "pepito",
+		Password: string(hashedPassword),
+		Roles:    []string{"admin"},
 	}
 
 	var loginUserTests = []struct {
@@ -185,20 +179,21 @@ func TestUpdateUser(t *testing.T) {
 
 	mockUserRepo := new(mocks.UserRepository)
 	mockRoleRepo := new(mocks.RolesRepository)
+
+	mockRoleRepo.On("GetAll", mock.Anything).Return([]domain.Role{
+		{Name: "admin"},
+		{Name: "test"},
+	}, nil)
 	ru := _rolesUseCase.NewRolesUseCase(mockRoleRepo)
 
-	mockUserRepo.On("GetAll", mock.Anything).Return([]domain.User{
-		domain.User{},
-	}, nil)
+	mockUserRepo.On("GetByUserName", mock.Anything, mock.Anything).Return(domain.User{}, nil)
 	u := _userUseCase.NewUserUseCase(mockUserRepo, ru, nil)
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("12345"), 8)
 	userInDb := domain.User{
-		UserName:       "pepito",
-		Password:       string(hashedPassword),
-		DocumentType:   1,
-		DocumentNumber: "38096937",
-		Roles:          []string{"admin"},
+		UserName: "pepito",
+		Password: string(hashedPassword),
+		Roles:    []string{"admin"},
 	}
 
 	var updateUserTests = []struct {
@@ -210,11 +205,9 @@ func TestUpdateUser(t *testing.T) {
 		{
 			nameTest: "success",
 			updateUser: domain.User{
-				UserName:       "pepito",
-				Password:       "asdasd",
-				DocumentType:   11,
-				DocumentNumber: "20-38096937-9",
-				Roles:          []string{"admin", "test"},
+				UserName: "pepito",
+				Password: "asdasd",
+				Roles:    []string{"admin", "test"},
 			},
 			prepare: func(repoUser, repoRole *mock.Mock) {
 				roles := []domain.Role{

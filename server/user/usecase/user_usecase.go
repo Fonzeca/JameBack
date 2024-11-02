@@ -4,7 +4,6 @@ import (
 	"context"
 	"math/rand"
 	"strconv"
-	"time"
 
 	"github.com/Carmind-Mindia/fastemail/src/sdk"
 	"github.com/Carmind-Mindia/user-hub/server/domain"
@@ -25,16 +24,15 @@ type UserUseCase struct {
 func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase, emailClient *sdk.FastEmailClient) UserUseCase {
 	uc := UserUseCase{repo: repo, rolecase: roleUsecase, fastEmailClient: emailClient}
 
-	_, err := uc.GetByUserName(context.Background(), "afonzo@mindia.com.ar")
+	superAdminUsername := viper.GetString("superAdmin.username")
+	superAdminPassword := viper.GetString("superAdmin.password")
+
+	_, err := uc.GetByUserName(context.Background(), superAdminUsername)
 	if err != nil {
 		//Si no existe el usuario, lo creamos
 		usr := domain.User{
-			FirstName:          "Alexis",
-			LastName:           "Fonzo",
-			UserName:           "afonzo@mindia.com.ar",
-			Password:           "123456",
-			DocumentType:       1,
-			DocumentNumber:     "12345678",
+			UserName:           superAdminUsername,
+			Password:           superAdminPassword,
 			MustChangePassword: viper.GetBool("mustChangeFirstTimePassword"),
 			Roles:              []string{"admin"},
 		}
@@ -66,32 +64,6 @@ func (uc *UserUseCase) Update(ctx context.Context, user *domain.User) error {
 	// Si no lo encuentra, devuelve error
 	if err != nil {
 		return err
-	}
-
-	//Validamos campos vacios en el request
-
-	if len(user.FirstName) > 0 {
-		usrDb.FirstName = user.FirstName
-	}
-
-	if len(user.LastName) > 0 {
-		usrDb.LastName = user.LastName
-	}
-
-	if user.DocumentType > 0 {
-		usrDb.DocumentType = user.DocumentType
-	}
-
-	if len(user.DocumentNumber) > 0 {
-		usrDb.DocumentNumber = user.DocumentNumber
-	}
-
-	if len(user.AvatarColor) > 0 {
-		usrDb.AvatarColor = user.AvatarColor
-	}
-
-	if len(user.Phone) > 0 {
-		usrDb.Phone = user.Phone
 	}
 
 	//Validamos que el usuario tenga bien los roles
@@ -189,7 +161,6 @@ func (ux *UserUseCase) Login(ctx context.Context, userName string, password stri
 		Username:           user.UserName,
 		Admin:              isAdmin,
 		Roles:              user.Roles,
-		FullName:           user.FirstName + " " + user.LastName,
 	}
 
 	return response, nil
@@ -287,33 +258,4 @@ func (ux *UserUseCase) NewPasswordFirstLogin(ctx context.Context, username strin
 		return err
 	}
 	return nil
-}
-
-func (ux *UserUseCase) SaveFCMToken(ctx context.Context, username string, FCMToken string) error {
-	user, err := ux.GetByUserName(ctx, username)
-	if err != nil {
-		return err
-	}
-
-	user.FCMToken = FCMToken
-	user.FCMCreateTimeStamp = strconv.FormatInt(time.Now().Unix(), 10)
-
-	err = ux.repo.Update(ctx, &user)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (ux *UserUseCase) GetTokensByTokenUsers(userNames []string, ctx context.Context) ([]struct {
-	FCMToken string `bson:"FCMToken"`
-}, error) {
-
-	//Buscamos tokens con los usernames que nos llegan desde rabbit
-	fcmTokens, err := ux.repo.GetFCMTokensByUserNames(ctx, userNames)
-	if err != nil {
-		return fcmTokens, err
-	}
-
-	return fcmTokens, err
 }

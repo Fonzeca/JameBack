@@ -9,7 +9,8 @@
         "port": "27017",
         "database": "UserHub",
         "user": "user",
-        "password": "somepassword"
+        "password": "somepassword",
+        "authSource" : ""
     },
     "server": {
         "port": "5623"
@@ -17,5 +18,9 @@
     "fastemail" : {
         "url" : "asdfas"
     },
-    "mustChangeFirstTimePassword" : true
+    "mustChangeFirstTimePassword" : true,
+    "superAdmin" : {
+        "username" : "admin",
+        "password" : "admin"
+    }
 }

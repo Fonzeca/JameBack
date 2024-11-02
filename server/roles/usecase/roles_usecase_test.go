@@ -15,6 +15,11 @@ import (
 func TestInsertRole(t *testing.T) {
 	repoMock := new(mocks.RolesRepository)
 
+	repoMock.On("GetAll", mock.Anything).Return([]domain.Role{
+		{Name: "admin"},
+		{Name: "test"},
+	}, nil).Once()
+
 	u := usecase.NewRolesUseCase(repoMock)
 
 	insertRoleCases := []struct {
@@ -64,6 +69,11 @@ func TestInsertRole(t *testing.T) {
 
 func TestValidateRoles(t *testing.T) {
 	repoMock := new(mocks.RolesRepository)
+
+	repoMock.On("GetAll", mock.Anything).Return([]domain.Role{
+		{Name: "admin"},
+		{Name: "test"},
+	}, nil).Once()
 
 	u := usecase.NewRolesUseCase(repoMock)
 
@@ -132,6 +142,11 @@ func TestValidateRoles(t *testing.T) {
 
 func TestDeleteRoles(t *testing.T) {
 	repoMock := new(mocks.RolesRepository)
+
+	repoMock.On("GetAll", mock.Anything).Return([]domain.Role{
+		{Name: "admin"},
+		{Name: "test"},
+	}, nil)
 
 	u := usecase.NewRolesUseCase(repoMock)
 

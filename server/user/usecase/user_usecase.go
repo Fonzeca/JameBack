@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"strconv"
 
-	"github.com/Carmind-Mindia/fastemail/src/sdk"
 	"github.com/Carmind-Mindia/user-hub/server/domain"
 	"github.com/Carmind-Mindia/user-hub/server/roles/usecase"
 	"github.com/Carmind-Mindia/user-hub/server/user/delivery/modelview"
@@ -16,13 +15,12 @@ import (
 )
 
 type UserUseCase struct {
-	repo            domain.UserRepository
-	rolecase        usecase.RolesUseCase
-	fastEmailClient *sdk.FastEmailClient
+	repo     domain.UserRepository
+	rolecase usecase.RolesUseCase
 }
 
-func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase, emailClient *sdk.FastEmailClient) UserUseCase {
-	uc := UserUseCase{repo: repo, rolecase: roleUsecase, fastEmailClient: emailClient}
+func NewUserUseCase(repo domain.UserRepository, roleUsecase usecase.RolesUseCase) UserUseCase {
+	uc := UserUseCase{repo: repo, rolecase: roleUsecase}
 
 	superAdminUsername := viper.GetString("superAdmin.username")
 	superAdminPassword := viper.GetString("superAdmin.password")
@@ -183,10 +181,10 @@ func (ux *UserUseCase) SendEmailRecoverPassword(ctx context.Context, username st
 
 	user.RecoverPasswordToken = string(hashedPassword)
 
-	err = ux.fastEmailClient.SendRecoverPassword(username, strconv.Itoa(u4))
-	if err != nil {
-		return err
-	}
+	// err = ux.fastEmailClient.SendRecoverPassword(username, strconv.Itoa(u4))
+	// if err != nil {
+	// 	return err
+	// }
 
 	err = ux.repo.Update(ctx, &user)
 	if err != nil {

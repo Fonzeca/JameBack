@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Carmind-Mindia/fastemail/src/sdk"
 	_RESTrole "github.com/Carmind-Mindia/user-hub/server/roles/delivery/REST"
 	_mongoroles "github.com/Carmind-Mindia/user-hub/server/roles/repository/mongodb"
 	_usecaseroles "github.com/Carmind-Mindia/user-hub/server/roles/usecase"
@@ -33,23 +32,12 @@ func init() {
 }
 
 func main() {
-	// _, closeFunc := services.SetupRabbitMq()
-	// defer closeFunc()
-
-	fastEmailConfig := sdk.Config{
-		Url: viper.GetString("fastemail.url"),
-	}
-
-	client := sdk.NewEmailClient(fastEmailConfig)
 
 	reporoles := _mongoroles.NewMongoRolesRepository(Db)
 	repousers := _mongouser.NewMongoUserRepository(Db)
 
-	// entry.DataEntryManager = manager.NewDataEntryManager(repousers)
-	// entry.NewRabbitMqDataEntry()
-
 	repoUseCase := _usecaseroles.NewRolesUseCase(reporoles)
-	userUseCase := _usecaseuser.NewUserUseCase(repousers, repoUseCase, &client)
+	userUseCase := _usecaseuser.NewUserUseCase(repousers, repoUseCase)
 
 	rolesApi := _RESTrole.NewuserApi(repoUseCase)
 	userApi := _RESTuser.NewuserApi(userUseCase)

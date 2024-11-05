@@ -26,7 +26,7 @@ func TestCreateUser(t *testing.T) {
 	ru := _rolesUseCase.NewRolesUseCase(mockRoleRepo)
 
 	mockUserRepo.On("GetByUserName", mock.Anything, mock.Anything).Return(domain.User{}, nil).Once()
-	u := _userUseCase.NewUserUseCase(mockUserRepo, ru, nil)
+	u := _userUseCase.NewUserUseCase(mockUserRepo, ru)
 
 	var createUserTests = []struct {
 		nameTest      string
@@ -97,7 +97,7 @@ func TestLogin(t *testing.T) {
 	// mockUserRepo.On("GetAll", mock.Anything).Return([]domain.User{
 	// 	domain.User{},
 	// }, nil)
-	u := _userUseCase.NewUserUseCase(mockUserRepo, ru, nil)
+	u := _userUseCase.NewUserUseCase(mockUserRepo, ru)
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("12345"), 8)
 	userInDb := domain.User{
@@ -187,7 +187,7 @@ func TestUpdateUser(t *testing.T) {
 	ru := _rolesUseCase.NewRolesUseCase(mockRoleRepo)
 
 	mockUserRepo.On("GetByUserName", mock.Anything, mock.Anything).Return(domain.User{}, nil)
-	u := _userUseCase.NewUserUseCase(mockUserRepo, ru, nil)
+	u := _userUseCase.NewUserUseCase(mockUserRepo, ru)
 
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("12345"), 8)
 	userInDb := domain.User{

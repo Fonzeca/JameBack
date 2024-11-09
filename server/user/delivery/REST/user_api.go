@@ -42,7 +42,7 @@ func (api *UserApi) Router(e *echo.Echo) {
 	pwGroup.POST("/recover", api.SendEmailToRecoverPassword)
 	pwGroup.POST("/validateToken", api.ValidateRecoverPasswordToken)
 	pwGroup.POST("/reset", api.ResetPasswordWithToken)
-	pwGroup.POST("/reset-without-token", api.FirstLoginResetPassword, security.ParseHeadersMiddleware)
+	pwGroup.POST("/reset-without-token", api.ResetPasswordWithoutToken, security.ParseHeadersMiddleware)
 
 	e.GET("/logged", api.GetUserLogged, security.ParseHeadersMiddleware)
 	e.POST("/validate", api.ValidateToken, security.ParseHeadersMiddleware)

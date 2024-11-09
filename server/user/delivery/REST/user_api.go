@@ -12,6 +12,7 @@ import (
 	"github.com/Carmind-Mindia/user-hub/server/user/usecase"
 	"github.com/Carmind-Mindia/user-hub/server/utils"
 	"github.com/labstack/echo/v4"
+	"github.com/spf13/viper"
 )
 
 type UserApi struct {
@@ -253,6 +254,11 @@ func (api *UserApi) ResetPasswordWithToken(c echo.Context) error {
 func (api *UserApi) FirstLoginResetPassword(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
+
+	canIt := viper.GetBool("canResetPasswordWithoutToken")
+	if !canIt {
+		return echo.NewHTTPError(http.StatusUnauthorized, "Endpoint disabled")
+	}
 
 	//Obtenemos la nueva contraseña
 	newPass := c.QueryParam("newPassword")

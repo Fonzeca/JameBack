@@ -19,6 +19,7 @@
         "url" : "asdfas"
     },
     "mustChangeFirstTimePassword" : true,
+    "canResetPasswordWithoutToken" : true,
     "superAdmin" : {
         "username" : "admin",
         "password" : "admin"

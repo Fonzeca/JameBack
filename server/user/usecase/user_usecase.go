@@ -257,3 +257,25 @@ func (ux *UserUseCase) NewPasswordFirstLogin(ctx context.Context, username strin
 	}
 	return nil
 }
+
+func (uc *UserUseCase) ResetPasswordWithoutToken(ctx context.Context, view modelview.ResetPasswordWithoutToken) error {
+	user, err := uc.repo.GetByUserName(ctx, view.Username)
+	if err != nil {
+		return err
+	}
+
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(view.NewPassword), 8)
+
+	if user.Password == string(hashed) {
+		return utils.ErrSamePassword
+	}
+
+	user.Password = string(hashed)
+	user.RecoverPasswordToken = ""
+
+	err = uc.repo.Update(ctx, &user)
+	if err != nil {
+		return err
+	}
+	return nil
+}

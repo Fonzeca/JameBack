@@ -41,6 +41,7 @@ func (api *UserApi) Router(e *echo.Echo) {
 	pwGroup.POST("/recover", api.SendEmailToRecoverPassword)
 	pwGroup.POST("/validateToken", api.ValidateRecoverPasswordToken)
 	pwGroup.POST("/reset", api.ResetPasswordWithToken)
+	pwGroup.POST("/reset-without-token", api.FirstLoginResetPassword, security.ParseHeadersMiddleware)
 
 	e.GET("/logged", api.GetUserLogged, security.ParseHeadersMiddleware)
 	e.POST("/validate", api.ValidateToken, security.ParseHeadersMiddleware)
@@ -263,6 +264,29 @@ func (api *UserApi) FirstLoginResetPassword(c echo.Context) error {
 	}
 
 	err := api.useCase.NewPasswordFirstLogin(ctx, username, newPass)
+	if err != nil {
+		return err
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+// Cambiamos la contraseña si es el primer inicio de sesion
+func (api *UserApi) ResetPasswordWithoutToken(c echo.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	usernameAuth := c.Get("username").(string)
+	isAdminAuth := c.Get("admin").(bool)
+
+	request := modelview.ResetPasswordWithoutToken{}
+	c.Bind(&request)
+
+	if !isAdminAuth && usernameAuth != request.Username {
+		return utils.ErrUnauthorized
+	}
+
+	err := api.useCase.ResetPasswordWithoutToken(ctx, request)
 	if err != nil {
 		return err
 	}

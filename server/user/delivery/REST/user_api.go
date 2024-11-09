@@ -77,6 +77,10 @@ func (api *UserApi) InsertOne(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
+	if !c.Get("admin").(bool) {
+		return utils.ErrUnauthorized
+	}
+
 	user := domain.User{}
 	c.Bind(&user)
 

@@ -11,5 +11,4 @@ type LoginResponse struct {
 	Username           string   `json:"username"`
 	Admin              bool     `json:"admin"`
 	Roles              []string `json:"roles"`
-	FullName           string   `json:"fullName"`
 }
